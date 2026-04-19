@@ -773,17 +773,6 @@ nav ul li:hover a {
         z-index: 1200;
     }
 
-    nav ul::before {
-        content: "";
-        position: absolute;
-        inset: 170px 18px 130px;
-        background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(28, 28, 28, 0.08)),
-            url("../img/ensaio1.webp") center / cover no-repeat;
-        opacity: 0.3;
-        pointer-events: none;
-    }
-
     nav ul li {
         width: min(88vw, 360px);
         padding: 0;
@@ -915,6 +904,7 @@ nav ul li:hover a {
     #sec3 {
         min-height: 950px;
     }
+
     #conteudoValores {
         margin-top: 50px;
         flex-direction: column;
@@ -1370,6 +1360,7 @@ nav ul li:hover a {
     nav {
         width: 100%;
     }
+
     nav ul {
         margin: 0;
     }
