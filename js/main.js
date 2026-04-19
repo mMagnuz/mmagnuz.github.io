@@ -1,10 +1,21 @@
 // GSAP
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
 
+const MOBILE_BREAKPOINT = 767;
+const TABLET_BREAKPOINT = 1019;
+
 let smoother = null;
 
+function getScrollY() {
+    return window.scrollY || window.pageYOffset || 0;
+}
+
+function isPhoneViewport() {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
 function isMobileViewport() {
-    return window.matchMedia("(max-width: 1019px)").matches;
+    return window.innerWidth <= TABLET_BREAKPOINT;
 }
 
 function setupSmoother() {
@@ -35,11 +46,11 @@ function initNavbarScroll() {
 
     const hideOffset = 72;
     const scrollDelta = 8;
-    let lastScrollY = window.scrollY || window.pageYOffset || 0;
+    let lastScrollY = getScrollY();
     let ticking = false;
 
     const updateNavbar = () => {
-        const currentScrollY = window.scrollY || window.pageYOffset || 0;
+        const currentScrollY = getScrollY();
         const menuOpen = Boolean(menuToggle?.checked) || document.body.classList.contains("menu-open");
 
         if (menuOpen || currentScrollY <= hideOffset) {
@@ -61,16 +72,15 @@ function initNavbarScroll() {
         window.requestAnimationFrame(updateNavbar);
     };
 
+    const syncNavbarWithViewport = () => {
+        lastScrollY = getScrollY();
+        updateNavbar();
+    };
+
     updateNavbar();
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", () => {
-        lastScrollY = window.scrollY || window.pageYOffset || 0;
-        updateNavbar();
-    });
-    window.addEventListener("orientationchange", () => {
-        lastScrollY = window.scrollY || window.pageYOffset || 0;
-        updateNavbar();
-    });
+    window.addEventListener("resize", syncNavbarWithViewport);
+    window.addEventListener("orientationchange", syncNavbarWithViewport);
 
     menuToggle?.addEventListener("change", () => {
         window.requestAnimationFrame(updateNavbar);
@@ -101,7 +111,7 @@ function initNavSectionHighlight() {
 
     const getScrollThreshold = () => {
         const navHeight = nav.getBoundingClientRect().height || 0;
-        return window.scrollY + navHeight + 24;
+        return getScrollY() + navHeight + 24;
     };
 
     const setActiveTarget = (targetId) => {
@@ -120,7 +130,7 @@ function initNavSectionHighlight() {
         let currentTargetId = "top";
 
         for (const { targetId, target } of sectionLinks) {
-            const targetTop = target.getBoundingClientRect().top + window.scrollY;
+            const targetTop = target.offsetTop;
             if (threshold >= targetTop) {
                 currentTargetId = targetId;
             }
@@ -145,6 +155,8 @@ function initNavSectionHighlight() {
 
 // ================= INIT =================
 document.addEventListener("DOMContentLoaded", () => {
+    const refreshScrollTriggers = () => ScrollTrigger.refresh();
+
     setupSmoother();
     initNavbarScroll();
     initNavSectionHighlight();
@@ -155,11 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.fonts.ready.then(() => {
         animarPagina();
-        ScrollTrigger.refresh();
+        refreshScrollTriggers();
     });
 
     window.addEventListener("load", () => {
-        ScrollTrigger.refresh();
+        refreshScrollTriggers();
     });
 
     let resizeTimer;
@@ -167,13 +179,13 @@ document.addEventListener("DOMContentLoaded", () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
             setupSmoother();
-            ScrollTrigger.refresh();
+            refreshScrollTriggers();
         }, 150);
     });
 
     window.addEventListener("orientationchange", () => {
         setupSmoother();
-        ScrollTrigger.refresh();
+        refreshScrollTriggers();
     });
 });
 
@@ -246,8 +258,8 @@ function initPalavras() {
 }
 
 function initPortfolio() {
-    const portfolioSection = document.querySelector("#sec5");
-    const portfolioCards = Array.from(document.querySelectorAll("#sec5 .portfolio"));
+    const portfolioSection = document.querySelector("#portfolio");
+    const portfolioCards = Array.from(document.querySelectorAll("#portfolio .portfolio"));
     const portfolioIntro = Array.from(document.querySelectorAll("#textoPortfolio .portfolio-kicker, #textoPortfolio p"));
 
     if (!portfolioSection || !portfolioCards.length) return;
@@ -283,7 +295,7 @@ function initPortfolio() {
         }, "-=0.35");
     };
 
-    const portfolioStart = window.innerWidth <= 767 ? "top 62%" : window.innerWidth <= 1019 ? "top 70%" : "top 78%";
+    const portfolioStart = isPhoneViewport() ? "top 62%" : isMobileViewport() ? "top 70%" : "top 78%";
 
     ScrollTrigger.create({
         trigger: portfolioSection,
@@ -293,7 +305,7 @@ function initPortfolio() {
         once: true
     });
 
-    const viewportThreshold = window.innerWidth <= 767 ? 0.35 : 0.15;
+    const viewportThreshold = isPhoneViewport() ? 0.35 : 0.15;
     if (ScrollTrigger.isInViewport(portfolioSection, viewportThreshold)) {
         playPortfolio();
     }
@@ -303,8 +315,8 @@ function initPortfolio() {
 // ============== ANIMAÇÕES ===============
 function animarPagina() {
     const textosAnim = document.querySelectorAll(".textoAnimado");
-    const isMobile = window.innerWidth <= 767;
-    const isTablet = window.innerWidth <= 1019;
+    const isMobile = isPhoneViewport();
+    const isTablet = isMobileViewport();
 
     let startValue;
     if (isMobile) {
@@ -315,10 +327,15 @@ function animarPagina() {
         startValue = "top 100%";
     }
 
-    const sectionStart = isMobile ? "top 38%" : isTablet ? "top 45%" : "top 50%";
+    const sectionStart = isMobile ? "top 48%" : isTablet ? "top 55%" : "top 50%";
     const servicesStart = isMobile ? "top 40%" : isTablet ? "top 46%" : "top 50%";
 
     textosAnim.forEach(textoA => {
+        let textStart = startValue;
+        if (textoA.matches("#textoQuemSomos h2")) {
+            textStart = isMobile ? "top 50%" : isTablet ? "top 42%" : "top 62%";
+        }
+
         const split = new SplitText(textoA, {
             type: "lines, words, chars",
             linesClass: "split-line"
@@ -329,8 +346,9 @@ function animarPagina() {
         gsap.timeline({
             scrollTrigger: {
                 trigger: textoA,
-                start: startValue,
-                toggleActions: "play reverse play reverse",
+                start: textStart,
+                toggleActions: "play none none none",
+                once: true,
                 invalidateOnRefresh: true
             }
         }).to(split.chars, {
@@ -353,12 +371,15 @@ function animarPagina() {
     gsap.to("#direitaHero", {
         y: 100,
         scrollTrigger: {
-            trigger: "#sec2",
+            trigger: "#sobre",
             start: "top bottom",
             end: "center center",
             scrub: 1
         }
     });
+
+    const quemSomosImageTrigger = isMobile ? "#imgQuemSomos" : "#sobre";
+    const quemSomosImageStart = isMobile ? "top 88%" : sectionStart;
 
     gsap.from("#imgQuemSomos", {
         y: 100,
@@ -366,19 +387,27 @@ function animarPagina() {
         duration: 1,
         filter: "blur(6px)",
         scrollTrigger: {
-            trigger: "#sec2",
-            start: sectionStart,
-            ease: "power2.inOut"
+            trigger: quemSomosImageTrigger,
+            start: quemSomosImageStart,
+            ease: "power2.inOut",
+            once: true,
+            invalidateOnRefresh: true
         }
     });
 
+
+    const valoresImageTrigger1 = isMobile ? "#img1valor" : "#valores";
+    const valoresImageTrigger2 = isMobile ? "#img2valor" : "#valores";
+    const valoresImageStart = isMobile ? "top 88%" : sectionStart;
 
     gsap.from("#img1valor", {
         y: -150,
         opacity: 0,
         scrollTrigger: {
-            trigger: "#sec3",
-            start: sectionStart
+            trigger: valoresImageTrigger1,
+            start: valoresImageStart,
+            once: true,
+            invalidateOnRefresh: true
         }
     });
 
@@ -387,29 +416,67 @@ function animarPagina() {
         opacity: 0,
         delay: 0.2,
         scrollTrigger: {
-            trigger: "#sec3",
-            start: sectionStart
+            trigger: valoresImageTrigger2,
+            start: valoresImageStart,
+            once: true,
+            invalidateOnRefresh: true
         }
     });
 
 
-    gsap.set(".polaroid", {
-        scale: 1.4,
-        opacity: 0,
-        y: -10
-    });
+    const polaroids = Array.from(document.querySelectorAll(".polaroid"));
 
-    gsap.to(".polaroid", {
-        scale: 1,
-        y: 0,
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.2,
-        scrollTrigger: {
-            trigger: "#servicos",
-            start: servicesStart
-        }
-    });
+    if (isMobile) {
+        polaroids.forEach((polaroid, index) => {
+            const fromX = index % 2 === 0
+                ? -Math.min(window.innerWidth * 0.55, 280)
+                : Math.min(window.innerWidth * 0.55, 280);
+
+            gsap.fromTo(polaroid, {
+                x: fromX,
+                scale: 0.98,
+                opacity: 0
+            }, {
+                x: 0,
+                scale: 1,
+                opacity: 1,
+                duration: 1,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: polaroid,
+                    start: "top 92%",
+                    once: true,
+                    invalidateOnRefresh: true
+                }
+            });
+        });
+    } else {
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "#servicosGrid",
+                start: servicesStart,
+                once: true,
+                invalidateOnRefresh: true
+            }
+        });
+
+        polaroids.forEach((polaroid, index) => {
+            const rotation = gsap.getProperty(polaroid, "rotation") || 0;
+
+            tl.fromTo(polaroid, {
+                rotation,
+                scale: 1.4,
+                opacity: 0,
+                y: -10
+            }, {
+                rotation,
+                scale: 1,
+                y: 0,
+                opacity: 1,
+                duration: 0.3
+            }, index * 0.1);
+        });
+    }
 }
 
 function initMobileMenu() {
@@ -417,11 +484,12 @@ function initMobileMenu() {
     if (!menuToggle) return;
 
     const syncMenuState = () => {
-        document.body.classList.toggle("menu-open", menuToggle.checked && window.innerWidth <= 767);
+        document.body.classList.toggle("menu-open", menuToggle.checked && isPhoneViewport());
     };
 
     menuToggle.addEventListener("change", syncMenuState);
     window.addEventListener("resize", syncMenuState);
+    syncMenuState();
 }
 
 function closeMobileMenu() {

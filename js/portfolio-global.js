@@ -1,9 +1,11 @@
 gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
 
+const TABLET_BREAKPOINT = 1019;
+
 let smoother = null;
 
 function isMobileViewport() {
-    return window.matchMedia("(max-width: 1019px)").matches;
+    return window.innerWidth <= TABLET_BREAKPOINT;
 }
 
 function setupSmoother() {
@@ -107,7 +109,10 @@ function initPortfolioGalleryLightbox() {
         viewer.classList.add("is-switching");
         imageElement.style.opacity = "0";
 
-        imageElement.onload = () => {
+        let loaded = false;
+        const handleImageLoad = () => {
+            if (loaded) return;
+            loaded = true;
             updateCounter();
             resetTransform(false);
             requestAnimationFrame(() => {
@@ -116,8 +121,14 @@ function initPortfolioGalleryLightbox() {
             });
         };
 
+        imageElement.onload = handleImageLoad;
+
         imageElement.src = source.currentSrc || source.src;
         imageElement.alt = source.alt || `Imagem ${currentIndex + 1}`;
+
+        if (imageElement.complete) {
+            handleImageLoad();
+        }
     };
 
     const showNext = () => setImageFromIndex(currentIndex + 1);
