@@ -71,6 +71,10 @@ function initNavbarScroll() {
         lastScrollY = window.scrollY || window.pageYOffset || 0;
         updateNavbar();
     });
+
+    menuToggle?.addEventListener("change", () => {
+        window.requestAnimationFrame(updateNavbar);
+    });
 }
 
 function initNavSectionHighlight() {
@@ -422,10 +426,12 @@ function initMobileMenu() {
 
 function closeMobileMenu() {
     const menuToggle = document.getElementById("menu-toggle");
+    const nav = document.querySelector("nav");
     if (!menuToggle) return;
 
     if (menuToggle.checked) {
         menuToggle.checked = false;
     }
     document.body.classList.remove("menu-open");
+    nav?.classList.remove("hide");
 }
