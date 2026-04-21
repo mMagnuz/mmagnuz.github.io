@@ -212,7 +212,10 @@ nav ul li:hover a {
     box-sizing: border-box;
     color: #3B3B3B;
     cursor: pointer;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
     font-size: 1.4rem;
     font-weight: 600;
     line-height: normal;
@@ -230,8 +233,19 @@ nav ul li:hover a {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    width: 40%;
+    width: fit-content;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    white-space: nowrap;
     will-change: transform;
+}
+
+#esquerdaHero .btn img,
+.btnServicos img {
+    width: 0.75em;
+    height: 0.75em;
+    flex: 0 0 auto;
+    transition: filter 0.3s ease;
 }
 
 #esquerdaHero .btn:disabled {
@@ -245,16 +259,23 @@ nav ul li:hover a {
     transform: translateY(-2px);
 }
 
+#esquerdaHero .btn:hover img,
+.btnServicos:hover img {
+    filter: brightness(0) invert(1);
+}
+
 #esquerdaHero .btn:active {
     box-shadow: none;
     transform: translateY(0);
 }
 
 #esquerdaHero h1 {
-    font-size: clamp(3rem, 4vw, 4.8rem);
-    color: #211E1E;
-    line-height: 1.02;
-    margin-bottom: 20px;
+    font-size: clamp(3.2rem, 4vw, 5rem);
+    color: #1c1a1a;
+    line-height: 1.05;
+    letter-spacing: -1px;
+
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 #esquerdaHero h2 {
@@ -282,6 +303,8 @@ nav ul li:hover a {
 
     z-index: 1;
     filter: blur(6px);
+
+    animation: blobMove 3s ease-in-out infinite;
 }
 
 #direitaHero {
@@ -302,6 +325,50 @@ nav ul li:hover a {
 #boxImgHero img {
     width: 100%;
     height: auto;
+    animation: floatImage 6s ease-in-out infinite;
+    animation-delay: 1.5s;
+}
+
+@keyframes blobMove {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes floatImage {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes floatImage2 {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
 }
 
 .polaroid,
@@ -366,6 +433,8 @@ nav ul li:hover a {
 #imgQuemSomos img {
     width: 70%;
     height: auto;
+    animation: floatImage 6s ease-in-out infinite;
+    animation-delay: 1.5s;
 }
 
 /* Estilos para a seção VALORES */
@@ -426,1327 +495,1399 @@ nav ul li:hover a {
     margin-left: 20rem;
 }
 
+#img1valor img {
+    animation: floatImage 6s ease-in-out infinite;
+    animation-delay: 1.5s;
+}
+
+#img2valor img {
+    animation: floatImage2 6s ease-in-out infinite;
+    animation-delay: 1.5s;
+}
+
 
 /* Estilos para a seção SERVIÇOS */
 #servicos {
-        background: linear-gradient(135deg, #d8d1c9, #cfc7bd);
-    }
+    background: linear-gradient(135deg, #d8d1c9, #cfc7bd);
+}
 
-    #conteudoServicos {
-        width: 100%;
-        display: flex;
-        padding: 20px;
-        gap: 40px;
-    }
+#conteudoServicos {
+    width: 100%;
+    display: flex;
+    padding: 20px;
+    gap: 40px;
+}
 
-    #servicosGrid {
-        width: 50%;
-        margin-top: 5rem;
-        position: relative;
-        height: 900px;
-        padding: 2rem;
-    }
+#servicosGrid {
+    width: 50%;
+    margin-top: 5rem;
+    position: relative;
+    height: 900px;
+    padding: 2rem;
+}
 
-    .polaroid {
-        position: absolute;
-        border-radius: 2px;
-        background: #f8f6f2;
-        padding: 20px 20px 40px 20px;
-        width: 240px;
+.polaroid {
+    position: absolute;
+    border-radius: 2px;
+    background: #f8f6f2;
+    padding: 20px 20px 40px 20px;
+    width: 240px;
 
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 12px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), 0 12px 25px rgba(0, 0, 0, 0.2);
 
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-    .polaroid img {
+.polaroid img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.polaroid p {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: #333;
+}
+
+.polaroid:hover {
+    z-index: 10;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.polaroid:nth-child(1) {
+    top: 40px;
+    left: 120px;
+    transform: rotate(-8deg);
+    z-index: 2;
+}
+
+.polaroid:nth-child(2) {
+    top: 0;
+    left: 400px;
+    transform: rotate(5deg);
+    z-index: 3;
+}
+
+.polaroid:nth-child(3) {
+    top: 40px;
+    left: 660px;
+    transform: rotate(-3deg);
+    z-index: 3;
+}
+
+.polaroid:nth-child(4) {
+    top: 350px;
+    left: 100px;
+    transform: rotate(6deg);
+}
+
+.polaroid:nth-child(5) {
+    top: 400px;
+    left: 350px;
+    transform: rotate(-5deg);
+}
+
+.polaroid:nth-child(6) {
+    top: 350px;
+    left: 620px;
+    transform: rotate(8deg);
+}
+
+
+#textoServicos {
+    padding: 2rem;
+    width: 40%;
+    margin-top: 4rem;
+    text-align: justify;
+    font-size: 1.2rem;
+    color: #252121;
+    font-weight: 350;
+    line-height: 2.0;
+    letter-spacing: .04rem;
+}
+
+#textoServicos h2 {
+    font-size: clamp(2.6rem, 4vw, 4.8rem);
+    font-weight: 100;
+    color: #211E1E;
+    line-height: 1.02;
+    margin-bottom: 4rem;
+}
+
+#divBtn {
+    margin-top: 6rem;
+}
+
+.btnServicos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 20px 60px;
+
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+
+    color: #111;
+    text-decoration: none;
+
+    border: 2px solid #111;
+    background-color: transparent;
+
+    transition: all 0.3s ease;
+}
+
+.gallery-viewer__button img {
+    width: 1.15rem;
+    height: 1.15rem;
+    display: block;
+}
+
+.gallery-viewer__prev img {
+    transform: rotate(180deg);
+}
+
+.gallery-viewer__close img {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.btnServicos:hover {
+    background-color: #111;
+    color: #fff;
+    transform: scale(1.02);
+}
+
+
+/* Estilos para a seção PORTFÓLIO */
+#portfolio {
+    position: relative;
+    overflow: hidden;
+    padding: 7rem 0 8rem;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 16% 16%, rgba(221, 214, 203, 0.52) 0%, rgba(221, 214, 203, 0) 30%),
+        radial-gradient(circle at 84% 20%, rgba(201, 193, 182, 0.34) 0%, rgba(201, 193, 182, 0) 28%),
+        radial-gradient(circle at 56% 78%, rgba(238, 232, 223, 0.72) 0%, rgba(238, 232, 223, 0) 36%),
+        linear-gradient(180deg, #f6f1e8 0%, #ece5db 100%);
+}
+
+#conteudoPortfolio {
+    width: min(100%, 1320px);
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 2.5rem;
+}
+
+#textoPortfolio {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#textoPortfolio h2 {
+    font-size: clamp(2.6rem, 4vw, 4.8rem);
+    font-weight: 100;
+    color: #211E1E;
+    line-height: 1.02;
+    margin-bottom: 1.2rem;
+}
+
+#textoPortfolio p {
+    font-size: 1.15rem;
+    line-height: 1.95;
+    color: #2f2724;
+    max-width: 62ch;
+    margin: 0 auto;
+}
+
+#cardsPort {
+    display: grid;
+    padding: 40px;
+    width: 100vw;
+    height: 100dvh;
+    margin-left: calc(50% - 50vw);
+    grid-template-columns: minmax(220px, 1fr) minmax(300px, 1.25fr) minmax(220px, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    align-items: stretch;
+}
+
+.portfolio {
+    position: relative;
+    overflow: hidden;
+    border-radius: 28px;
+    background: #120f0d;
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.14),
+        0 2px 0 rgba(255, 255, 255, 0.28) inset;
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    transition:
+        transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.55s ease,
+        box-shadow 0.55s ease,
+        filter 0.55s ease;
+    will-change: transform, opacity;
+}
+
+#portfolioFeatured {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    min-height: 100%;
+}
+
+.portfolio-left-top {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.portfolio-left-bottom {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.portfolio-right-top {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+.portfolio-right-bottom {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.portfolio.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.portfolio:hover {
+    cursor: pointer;
+    box-shadow:
+        0 26px 54px rgba(0, 0, 0, 0.2),
+        0 2px 0 rgba(255, 255, 255, 0.32) inset;
+}
+
+.portfolio img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.08);
+    filter: saturate(0.95) contrast(1.05);
+    transition: transform 0.9s ease, filter 0.9s ease;
+}
+
+.portfolio:hover img {
+    transform: scale(1.14);
+    filter: saturate(1.05) contrast(1.08);
+}
+
+.portfolio::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(9, 7, 6, 0.05) 15%, rgba(9, 7, 6, 0.72) 100%);
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.portfolio-caption {
+    position: absolute;
+    left: 1.2rem;
+    right: 1.2rem;
+    bottom: 1.2rem;
+    z-index: 1;
+    color: #f7f1e8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.portfolio-caption strong {
+    font-size: clamp(1.1rem, 1.2vw, 1.5rem);
+    letter-spacing: 0.24em;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+
+@media screen and (min-width: 320px) and (max-width: 767px) {
+    #menu-toggle {
         display: block;
-        width: 100%;
-        height: auto;
-    }
-
-    .polaroid p {
-        text-align: center;
-        margin-top: 12px;
-        font-size: 0.9rem;
-        letter-spacing: 0.1em;
-        color: #333;
-    }
-
-    .polaroid:hover {
-        z-index: 10;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-    }
-
-    .polaroid:nth-child(1) {
-        top: 40px;
-        left: 120px;
-        transform: rotate(-8deg);
-        z-index: 2;
-    }
-
-    .polaroid:nth-child(2) {
-        top: 0;
-        left: 400px;
-        transform: rotate(5deg);
-        z-index: 3;
-    }
-
-    .polaroid:nth-child(3) {
-        top: 40px;
-        left: 660px;
-        transform: rotate(-3deg);
-        z-index: 3;
-    }
-
-    .polaroid:nth-child(4) {
-        top: 350px;
-        left: 100px;
-        transform: rotate(6deg);
-    }
-
-    .polaroid:nth-child(5) {
-        top: 400px;
-        left: 350px;
-        transform: rotate(-5deg);
-    }
-
-    .polaroid:nth-child(6) {
-        top: 350px;
-        left: 620px;
-        transform: rotate(8deg);
-    }
-
-
-    #textoServicos {
-        padding: 2rem;
-        width: 40%;
-        margin-top: 4rem;
-        text-align: justify;
-        font-size: 1.2rem;
-        color: #252121;
-        font-weight: 350;
-        line-height: 2.0;
-        letter-spacing: .04rem;
-    }
-
-    #textoServicos h2 {
-        font-size: clamp(2.6rem, 4vw, 4.8rem);
-        font-weight: 100;
-        color: #211E1E;
-        line-height: 1.02;
-        margin-bottom: 4rem;
-    }
-
-    #divBtn {
-        margin-top: 6rem;
-    }
-
-    .btnServicos {
-        display: inline-block;
-        padding: 20px 60px;
-
-        font-size: 1.4rem;
-        font-weight: 400;
-        letter-spacing: 0.08em;
-
-        color: #111;
-        text-decoration: none;
-
-        border: 2px solid #111;
-        background-color: transparent;
-
-        transition: all 0.3s ease;
-    }
-
-    .btnServicos:hover {
-        background-color: #111;
-        color: #fff;
-        transform: scale(1.02);
-    }
-
-
-    /* Estilos para a seção PORTFÓLIO */
-    #portfolio {
-        position: relative;
-        overflow: hidden;
-        padding: 7rem 0 8rem;
-        isolation: isolate;
-        background:
-            radial-gradient(circle at 16% 16%, rgba(221, 214, 203, 0.52) 0%, rgba(221, 214, 203, 0) 30%),
-            radial-gradient(circle at 84% 20%, rgba(201, 193, 182, 0.34) 0%, rgba(201, 193, 182, 0) 28%),
-            radial-gradient(circle at 56% 78%, rgba(238, 232, 223, 0.72) 0%, rgba(238, 232, 223, 0) 36%),
-            linear-gradient(180deg, #f6f1e8 0%, #ece5db 100%);
-    }
-
-    #conteudoPortfolio {
-        width: min(100%, 1320px);
-        margin: 0 auto;
-        position: relative;
-        z-index: 1;
-        display: grid;
-        gap: 2.5rem;
-    }
-
-    #textoPortfolio {
-        max-width: 760px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    #textoPortfolio h2 {
-        font-size: clamp(2.6rem, 4vw, 4.8rem);
-        font-weight: 100;
-        color: #211E1E;
-        line-height: 1.02;
-        margin-bottom: 1.2rem;
-    }
-
-    #textoPortfolio p {
-        font-size: 1.15rem;
-        line-height: 1.95;
-        color: #2f2724;
-        max-width: 62ch;
-        margin: 0 auto;
-    }
-
-    #cardsPort {
-        display: grid;
-        padding: 40px;
-        width: 100vw;
-        height: 100dvh;
-        margin-left: calc(50% - 50vw);
-        grid-template-columns: minmax(220px, 1fr) minmax(300px, 1.25fr) minmax(220px, 1fr);
-        grid-template-rows: repeat(2, minmax(0, 1fr));
-        gap: 1.2rem;
-        align-items: stretch;
-    }
-
-    .portfolio {
-        position: relative;
-        overflow: hidden;
-        border-radius: 28px;
-        background: #120f0d;
-        box-shadow:
-            0 18px 42px rgba(0, 0, 0, 0.14),
-            0 2px 0 rgba(255, 255, 255, 0.28) inset;
-        transform: translateY(0) scale(1);
-        opacity: 1;
-        transition:
-            transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-            opacity 0.55s ease,
-            box-shadow 0.55s ease,
-            filter 0.55s ease;
-        will-change: transform, opacity;
-    }
-
-    #portfolioFeatured {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        min-height: 100%;
-    }
-
-    .portfolio-left-top {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .portfolio-left-bottom {
-        grid-column: 1;
-        grid-row: 2;
-    }
-
-    .portfolio-right-top {
-        grid-column: 3;
-        grid-row: 1;
-    }
-
-    .portfolio-right-bottom {
-        grid-column: 3;
-        grid-row: 2;
-    }
-
-    .portfolio.is-visible {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    .portfolio:hover {
-        cursor: pointer;
-        box-shadow:
-            0 26px 54px rgba(0, 0, 0, 0.2),
-            0 2px 0 rgba(255, 255, 255, 0.32) inset;
-    }
-
-    .portfolio img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-        transform: scale(1.08);
-        filter: saturate(0.95) contrast(1.05);
-        transition: transform 0.9s ease, filter 0.9s ease;
-    }
-
-    .portfolio:hover img {
-        transform: scale(1.14);
-        filter: saturate(1.05) contrast(1.08);
-    }
-
-    .portfolio::after {
-        content: "";
         position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(9, 7, 6, 0.05) 15%, rgba(9, 7, 6, 0.72) 100%);
-        opacity: 0.9;
+        opacity: 0;
         pointer-events: none;
     }
 
-    .portfolio-caption {
-        position: absolute;
-        left: 1.2rem;
-        right: 1.2rem;
-        bottom: 1.2rem;
-        z-index: 1;
-        color: #f7f1e8;
+    .menu-icon {
         display: flex;
+        width: 34px;
+        height: 26px;
+    }
+
+    #menu-toggle:checked~ul {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    #menu-toggle:checked+.menu-icon span {
+        background-color: #5e5e5e;
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(1) {
+        transform: translateY(11.5px) rotate(45deg);
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0.2);
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(3) {
+        transform: translateY(-11.5px) rotate(-45deg);
+    }
+
+    nav {
+        padding: 16px 22px;
+        background-color: rgba(245, 243, 235, 0.75);
+        backdrop-filter: blur(8px);
+    }
+
+    nav ul {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
+        background: rgba(232, 232, 232, 0.95);
         flex-direction: column;
-        gap: 0.35rem;
+        justify-content: center;
+        align-items: center;
+        gap: 1.3rem;
+        margin: 0;
+        padding: 5.5rem 1rem 2.5rem;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-16px);
+        overflow: hidden;
+        transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
+        z-index: 1200;
     }
 
-    .portfolio-caption strong {
-        font-size: clamp(1.1rem, 1.2vw, 1.5rem);
-        letter-spacing: 0.24em;
-        line-height: 1.15;
-        font-weight: 700;
+    nav ul li {
+        width: min(88vw, 360px);
+        padding: 0;
+        border: 1px solid transparent;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    nav ul li.is-active {
+        border-color: #686868;
+    }
+
+    nav ul li a,
+    nav ul li button {
+        display: block;
+        width: 100%;
+        padding: 0.95rem 0.6rem;
+        color: #585858;
+        font-size: clamp(1.3rem, 6.4vw, 1.95rem);
+        font-weight: 300;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        transition: color 0.25s ease, background-color 0.25s ease;
+    }
+
+    nav ul li a:hover,
+    nav ul li button:hover {
+        color: #2f2f2f;
+        background-color: rgba(255, 255, 255, 0.35);
+    }
+
+    nav ul li::after {
+        display: none;
+    }
+
+    #logo {
+        width: 5.4rem;
+        position: relative;
+        margin: 0;
+        text-align: left;
+    }
+
+    #conteudoHero {
+        padding: 20px;
+        margin: auto;
+        margin-top: 5%;
+        justify-content: start;
+        align-items: start;
+        padding-bottom: 0;
+        flex-direction: column;
+    }
+
+    #esquerdaHero {
+        width: 100%;
+        margin: 0;
+        margin-bottom: 2rem;
+        z-index: 2;
+    }
+
+    #esquerdaHero h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #esquerdaHero h2 {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    #esquerdaHero .btn {
+        width: 80%;
+        padding: 20px;
+        font-size: 1rem;
+        align-self: center;
+    }
+
+    #direitaHero::before {
+        width: 20rem;
+        height: 20rem;
+        margin-right: 0%;
+    }
+
+    #direitaHero {
+        width: 100%;
+        margin: 0;
+        margin-top: 1rem;
+    }
+
+    #direitaHero #boxImgHero {
+        width: 80%;
     }
 
 
-    @media screen and (min-width: 320px) and (max-width: 767px) {
-        #menu-toggle {
-            display: block;
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
+    #sobre {
+        min-height: 1350px;
+    }
 
-        .menu-icon {
-            display: flex;
-            width: 34px;
-            height: 26px;
-        }
+    #conteudoQuemSomos {
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        gap: 0;
 
-        #menu-toggle:checked~ul {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        #menu-toggle:checked+.menu-icon span {
-            background-color: #5e5e5e;
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(1) {
-            transform: translateY(11.5px) rotate(45deg);
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0.2);
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(3) {
-            transform: translateY(-11.5px) rotate(-45deg);
-        }
-
-        nav {
-            padding: 16px 22px;
-            background-color: rgba(245, 243, 235, 0.75);
-            backdrop-filter: blur(8px);
-        }
-
-        nav ul {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100dvh;
-            background: rgba(232, 232, 232, 0.95);
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1.3rem;
-            margin: 0;
-            padding: 5.5rem 1rem 2.5rem;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transform: translateY(-16px);
-            overflow: hidden;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
-            z-index: 1200;
-        }
-
-        nav ul li {
-            width: min(88vw, 360px);
-            padding: 0;
-            border: 1px solid transparent;
-            position: relative;
-            z-index: 1;
+        #textoQuemSomos {
+            width: 100%;
+            margin-top: 5rem;
             text-align: center;
-        }
-
-        nav ul li.is-active {
-            border-color: #686868;
-        }
-
-        nav ul li a,
-        nav ul li button {
-            display: block;
-            width: 100%;
-            padding: 0.95rem 0.6rem;
-            color: #585858;
-            font-size: clamp(1.3rem, 6.4vw, 1.95rem);
-            font-weight: 300;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            transition: color 0.25s ease, background-color 0.25s ease;
-        }
-
-        nav ul li a:hover,
-        nav ul li button:hover {
-            color: #2f2f2f;
-            background-color: rgba(255, 255, 255, 0.35);
-        }
-
-        nav ul li::after {
-            display: none;
-        }
-
-        #logo {
-            width: 5.4rem;
-            position: relative;
-            z-index: 1201;
-        }
-
-        body.menu-open {
-            overflow: hidden;
-        }
-
-
-        #conteudoHero {
             padding: 20px;
-            padding-bottom: 0;
-            flex-direction: column;
-            margin-top: 5%;
-
-            #esquerdaHero {
-                width: 100%;
-                margin: 0;
-                margin-bottom: 2rem;
-                text-align: center;
-
-                h1 {
-                    font-size: 2rem;
-                    margin-bottom: 20px;
-                }
-
-                h2 {
-                    font-size: 1.3rem;
-                }
-
-                .btn {
-                    width: 80%;
-                    padding: 20px;
-                    font-size: 1rem;
-                    align-self: center;
-                }
-            }
-
-            #direitaHero::before {
-                width: 20rem;
-                height: 20rem;
-                margin-right: 0%;
-            }
-
-            #direitaHero {
-                width: 100%;
-                margin: 0;
-
-                #boxImgHero {
-                    width: 80%;
-                }
-            }
-        }
-
-
-        #sobre {
-            min-height: 1350px;
-        }
-
-        #conteudoQuemSomos {
-            flex-direction: column-reverse;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            gap: 0;
-
-            #textoQuemSomos {
-                width: 100%;
-                margin-top: 5rem;
-                text-align: center;
-                padding: 20px;
-
-                h2 {
-                    text-align: start;
-                    font-size: 2.5rem;
-                    margin-bottom: 2rem;
-                }
-
-                p {
-                    font-size: 1rem;
-                    text-align: justify;
-                }
-            }
-
-            #imgQuemSomos {
-                margin-top: 0;
-                width: 100%;
-            }
-        }
-
-        #valores {
-            min-height: 950px;
-        }
-
-        #conteudoValores {
-            margin-top: 50px;
-            flex-direction: column;
-            width: 100%;
-            gap: 20px;
-        }
-
-        #textoValores {
-            width: 100%;
-            text-align: justify;
-            font-family: poppins, sans-serif;
-            margin-bottom: 40px;
 
             h2 {
                 text-align: start;
                 font-size: 2.5rem;
-                margin-bottom: 1.6rem;
+                margin-bottom: 2rem;
             }
 
             p {
                 font-size: 1rem;
+                text-align: justify;
             }
         }
 
-        #imgsValores {
-            width: 100%;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            gap: 0;
-        }
-
-        #img1valor img,
-        #img2valor img {
-            width: 100%;
-        }
-
-        #img1valor,
-        #img2valor {
-            width: 220px;
-        }
-
-        #img1valor {
-            margin-left: .7rem;
-        }
-
-        #img2valor {
-            margin-left: 0;
-            z-index: -1;
-        }
-
-
-        #conteudoServicos {
-            flex-direction: column;
-            gap: 0;
-        }
-
-        #textoServicos {
-            order: -1;
-        }
-
-        #servicosGrid {
-            width: 100%;
-            height: auto;
-            display: grid;
-            grid-template-columns: 2fr;
-            gap: 1rem;
-        }
-
-        .polaroid {
-            position: relative;
-            width: 100%;
-            margin: 0 auto;
-            transform: rotate(0deg);
-        }
-
-        .polaroid:nth-child(n) {
-            top: 0;
-            left: 0;
-        }
-
-        #textoServicos {
-            width: 100%;
-            padding: 1rem;
+        #imgQuemSomos {
             margin-top: 0;
+            width: 100%;
         }
+    }
 
-        #textoServicos h2 {
+    #valores {
+        min-height: 950px;
+    }
+
+    #conteudoValores {
+        margin-top: 50px;
+        flex-direction: column;
+        width: 100%;
+        gap: 20px;
+    }
+
+    #textoValores {
+        width: 100%;
+        text-align: justify;
+        font-family: poppins, sans-serif;
+        margin-bottom: 40px;
+
+        h2 {
+            text-align: start;
             font-size: 2.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.6rem;
         }
 
-        #textoServicos p {
+        p {
             font-size: 1rem;
-        }
-
-        #divBtn {
-            text-align: center;
-            margin-top: 3rem;
-        }
-
-        .btnServicos {
-            padding: 16px 24px;
-            font-size: 1rem;
-        }
-
-        #portfolio {
-            padding: 4.5rem 0 5rem;
-        }
-
-        #conteudoPortfolio {
-            width: min(92%, 680px);
-            gap: 1.4rem;
-        }
-
-        #textoPortfolio {
-            max-width: 100%;
-        }
-
-        #portfolioFeatured {
-            grid-column: auto;
-            grid-row: auto;
-            min-height: 260px;
-            border-radius: 22px;
-        }
-
-        #textoPortfolio p {
-            font-size: 1rem;
-        }
-
-        #cardsPort {
-            grid-template-columns: 1fr;
-            grid-template-rows: auto;
-            grid-auto-rows: auto;
-        }
-
-        .portfolio {
-            grid-column: auto;
-            grid-row: auto;
-            min-height: 230px;
-            border-radius: 22px;
-        }
-
-        .portfolio-caption {
-            left: 1rem;
-            right: 1rem;
-            bottom: 1rem;
-        }
-
-        .portfolio-caption strong {
-            font-size: 1rem;
-        }
-
-    }
-
-    @media screen and (min-width: 768px) and (max-width: 1019px) {
-        #logo {
-            width: 7rem;
-        }
-
-        #menu-toggle {
-            display: block;
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .menu-icon {
-            display: flex;
-            width: 34px;
-            height: 26px;
-        }
-
-        #menu-toggle:checked~ul {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        #menu-toggle:checked+.menu-icon span {
-            background-color: #5e5e5e;
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(1) {
-            transform: translateY(11.5px) rotate(45deg);
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(2) {
-            opacity: 0;
-            transform: scaleX(0.2);
-        }
-
-        #menu-toggle:checked+.menu-icon span:nth-child(3) {
-            transform: translateY(-11.5px) rotate(-45deg);
-        }
-
-        nav {
-            padding: 20px 50px;
-            background-color: rgba(245, 243, 235, 0.75);
-            backdrop-filter: blur(8px);
-        }
-
-        nav ul {
-            position: fixed;
-            inset: 0;
-            width: 100vw;
-            height: 100dvh;
-            background: rgba(232, 232, 232, 0.95);
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1.3rem;
-            margin: 0;
-            padding: 5.5rem 1rem 2.5rem;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transform: translateY(-16px);
-            overflow: hidden;
-            transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
-            z-index: 1200;
-        }
-
-        nav ul li {
-            width: min(88vw, 360px);
-            padding: 0;
-            border: 1px solid transparent;
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        nav ul li.is-active {
-            border-color: #686868;
-        }
-
-        nav ul li a,
-        nav ul li button {
-            display: block;
-            width: 100%;
-            padding: 0.95rem 0.6rem;
-            color: #585858;
-            font-size: 1.35rem;
-            font-weight: 300;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            transition: color 0.25s ease, background-color 0.25s ease;
-        }
-
-        nav ul li a:hover,
-        nav ul li button:hover {
-            color: #2f2f2f;
-            background-color: rgba(255, 255, 255, 0.35);
-        }
-
-        nav ul li::after {
-            display: none;
-        }
-
-        body.menu-open {
-            overflow: hidden;
-        }
-
-
-        #conteudoHero {
-            padding: 20px;
-            margin: auto;
-            margin-top: 5%;
-            justify-content: start;
-            align-items: start;
-            padding-bottom: 0;
-
-            #esquerdaHero {
-                width: 50%;
-                margin: 0;
-                margin-bottom: 2rem;
-                z-index: 2;
-
-                h1 {
-                    font-size: 2.6rem;
-                    margin-bottom: 20px;
-                }
-
-                h2 {
-                    font-size: 1.5rem;
-                    text-align: justify;
-                }
-
-                .btn {
-                    width: 80%;
-                    padding: 20px;
-                    font-size: 1.2rem;
-                }
-            }
-
-            #direitaHero::before {
-                width: 20rem;
-                height: 20rem;
-                margin-right: 0%;
-            }
-
-            #direitaHero {
-                width: 50%;
-                margin: 0;
-
-                #boxImgHero {
-                    width: 80%;
-                }
-            }
-        }
-
-
-        #sobre {
-            padding: 20px;
-            min-height: 800px;
-        }
-
-        #conteudoQuemSomos {
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-
-
-            #textoQuemSomos {
-                order: 1;
-                width: 70%;
-                margin: 0;
-                margin-top: 5rem;
-                text-align: center;
-
-                h2 {
-                    text-align: start;
-                    font-size: 2.8rem;
-                    margin-bottom: 1.6rem;
-                }
-
-                p {
-                    font-size: 1.2rem;
-                    text-align: justify;
-                }
-            }
-
-            #imgQuemSomos {
-                order: 2;
-                margin: 0;
-                align-items: center;
-                justify-content: center;
-                width: 100%;
-                max-width: 420px;
-
-                img {
-                    width: auto;
-                    height: auto;
-                    max-width: 100%;
-                    max-height: 100%;
-                    display: block;
-                }
-            }
-        }
-
-        #valores {
-            min-height: 800px;
-        }
-
-        #conteudoValores {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            gap: 40px;
-        }
-
-        #textoValores {
-            width: 70%;
-            text-align: center;
-            margin-top: 2rem;
-
-            h2 {
-                text-align: start;
-                font-size: 2.8rem;
-                margin-bottom: 1.6rem;
-            }
-
-            p {
-                font-size: 1.2rem;
-                text-align: justify;
-            }
-        }
-
-        #imgsValores {
-            width: 100%;
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: flex-start;
-            margin: 0;
-        }
-
-        #img1valor,
-        #img2valor {
-            position: relative;
-            width: 240px;
-            aspect-ratio: 4 / 5;
-            overflow: hidden;
-        }
-
-        #img1valor img,
-        #img2valor img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        #img1valor img {
-            margin-top: 0;
-        }
-
-        #img2valor img {
-            margin-top: 0;
-        }
-
-        #img1valor {
-            left: auto;
-            top: auto;
-            margin-top: 1.5rem;
-        }
-
-        #img2valor {
-            left: auto;
-            top: auto;
-            margin-left: 0;
-            margin-top: 7rem;
-            z-index: -1;
-        }
-
-
-        #conteudoServicos {
-            flex-direction: column;
-            gap: 0;
-        }
-
-        #servicosGrid {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            justify-items: center;
-            align-items: start;
-            padding: 2rem 1rem;
-        }
-
-        .polaroid {
-            width: 100%;
-            max-width: 250px;
-            margin: 0;
-            position: static;
-        }
-
-        /* texto centralizado */
-        #textoServicos {
-            order: -1;
-            width: 100%;
-            margin-top: 2rem;
-        }
-
-        #textoServicos h2 {
-            font-size: 2.8rem;
-        }
-
-        #divBtn {
-            text-align: center;
         }
     }
 
-    @media screen and (min-width: 1020px) and (max-width: 1439px) {
-        #logo {
-            width: 7.5rem;
-        }
+    #imgsValores {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        gap: 0;
+    }
 
-        nav {
-            width: 100%;
-        }
+    #img1valor img,
+    #img2valor img {
+        width: 100%;
+    }
 
-        nav ul {
-            margin: 0;
-        }
+    #img1valor,
+    #img2valor {
+        width: 220px;
+    }
 
+    #img1valor {
+        margin-left: .7rem;
+    }
 
-        #conteudoHero {
-            padding: 20px;
-            padding-bottom: 0;
-            margin: auto;
-            margin-top: 4%;
-            justify-content: start;
-            align-items: start;
-
-            #esquerdaHero {
-                width: 45%;
-                margin: 0;
-                margin-bottom: 2rem;
-                z-index: 2;
-
-                h1 {
-                    font-size: 2.8rem;
-                    margin-bottom: 20px;
-                }
-
-                h2 {
-                    font-size: 1.5rem;
-                    text-align: justify;
-                }
-
-                .linha {
-                    flex-direction: column;
-
-                    p {
-                        margin: 10px 0 0 0;
-                        font-size: 1rem;
-                    }
-                }
-
-                .btn {
-                    width: 80%;
-                    padding: 20px;
-                    font-size: 1.2rem;
-                }
-            }
-
-            #direitaHero::before {
-                width: 25rem;
-                height: 25rem;
-                margin-right: 0%;
-            }
-
-            #direitaHero {
-                width: 55%;
-                margin: 0;
-
-                #boxImgHero {
-                    width: 70%;
-                }
-            }
-        }
+    #img2valor {
+        margin-left: 0;
+        z-index: -1;
+    }
 
 
-        #sobre {
-            min-height: 1000px;
-            padding: 20px;
-        }
+    #conteudoServicos {
+        flex-direction: column;
+        gap: 0;
+    }
 
-        #conteudoQuemSomos {
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
+    #textoServicos {
+        order: -1;
+    }
 
-            #textoQuemSomos {
-                width: 50%;
-                text-align: center;
-                margin-top: 2rem;
+    #servicosGrid {
+        width: 100%;
+        height: auto;
+        display: grid;
+        grid-template-columns: 2fr;
+        gap: 1rem;
+    }
 
-                h2 {
-                    text-align: start;
-                    font-size: 2.6rem;
-                    margin-bottom: 1.6rem;
-                }
+    .polaroid {
+        position: relative;
+        width: 100%;
+        margin: 0 auto;
+        transform: rotate(0deg);
+    }
 
-                p {
-                    font-size: 1.4rem;
-                    text-align: justify;
-                }
-            }
+    .polaroid:nth-child(n) {
+        top: 0;
+        left: 0;
+    }
 
-            #imgQuemSomos {
-                margin-top: 6rem;
-                align-items: start;
-                justify-content: start;
-                width: auto;
-                max-width: 40%;
+    #textoServicos {
+        width: 100%;
+        padding: 1rem;
+        margin-top: 0;
+    }
 
-                img {
-                    width: auto;
-                    height: auto;
-                    max-width: 100%;
-                    max-height: 100%;
-                    display: block;
-                }
-            }
-        }
+    #textoServicos h2 {
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    #textoServicos p {
+        font-size: 1rem;
+    }
+
+    #divBtn {
+        text-align: center;
+        margin-top: 3rem;
+    }
+
+    .btnServicos {
+        width: 80%;
+        padding: 20px;
+        font-size: 1rem;
+        align-self: center;
+    }
+
+    #portfolio {
+        padding: 4.5rem 0 5rem;
+    }
+
+    #conteudoPortfolio {
+        width: min(92%, 680px);
+        gap: 1.4rem;
+    }
+
+    #textoPortfolio {
+        max-width: 100%;
+    }
+
+    #portfolioFeatured {
+        grid-column: auto;
+        grid-row: auto;
+        min-height: 260px;
+        border-radius: 22px;
+    }
+
+    #textoPortfolio p {
+        font-size: 1rem;
+    }
+
+    #cardsPort {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-auto-rows: auto;
+    }
+
+    .portfolio {
+        grid-column: auto;
+        grid-row: auto;
+        min-height: 230px;
+        border-radius: 22px;
+    }
+
+    .portfolio-caption {
+        left: 1rem;
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .portfolio-caption strong {
+        font-size: 1rem;
+    }
+
+}
+
+@media screen and (min-width: 768px) and (max-width: 1019px) {
+    #logo {
+        width: 7rem;
+    }
+
+    #menu-toggle {
+        display: block;
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .menu-icon {
+        display: flex;
+        width: 34px;
+        height: 26px;
+    }
+
+    #menu-toggle:checked~ul {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    #menu-toggle:checked+.menu-icon span {
+        background-color: #5e5e5e;
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(1) {
+        transform: translateY(11.5px) rotate(45deg);
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0.2);
+    }
+
+    #menu-toggle:checked+.menu-icon span:nth-child(3) {
+        transform: translateY(-11.5px) rotate(-45deg);
+    }
+
+    nav {
+        padding: 20px 50px;
+        background-color: rgba(245, 243, 235, 0.75);
+        backdrop-filter: blur(8px);
+    }
+
+    nav ul {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100dvh;
+        background: rgba(232, 232, 232, 0.95);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1.3rem;
+        margin: 0;
+        padding: 5.5rem 1rem 2.5rem;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-16px);
+        overflow: hidden;
+        transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
+        z-index: 1200;
+    }
+
+    nav ul li {
+        width: min(88vw, 360px);
+        padding: 0;
+        border: 1px solid transparent;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    nav ul li.is-active {
+        border-color: #686868;
+    }
+
+    nav ul li a,
+    nav ul li button {
+        display: block;
+        width: 100%;
+        padding: 0.95rem 0.6rem;
+        color: #585858;
+        font-size: 1.35rem;
+        font-weight: 300;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        transition: color 0.25s ease, background-color 0.25s ease;
+    }
+
+    nav ul li a:hover,
+    nav ul li button:hover {
+        color: #2f2f2f;
+        background-color: rgba(255, 255, 255, 0.35);
+    }
+
+    nav ul li::after {
+        display: none;
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
 
 
-        #valores {
-            min-height: 850px;
-        }
+    #conteudoHero {
+        padding: 20px;
+        margin: auto;
+        margin-top: 5%;
+        justify-content: start;
+        align-items: start;
+        padding-bottom: 0;
 
-        #conteudoValores {
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        #textoValores {
+        #esquerdaHero {
             width: 50%;
-            text-align: center;
-            margin-top: 2rem;
+            margin: 0;
+            margin-bottom: 2rem;
+            z-index: 2;
+
+            h1 {
+                font-size: 2.6rem;
+                margin-bottom: 20px;
+            }
 
             h2 {
-                text-align: start;
-                font-size: 2.8rem;
-                margin-bottom: 1.6rem;
-            }
-
-            p {
-                font-size: 1.2rem;
+                font-size: 1.5rem;
                 text-align: justify;
             }
+
+            .btn {
+                width: 80%;
+                padding: 20px;
+                font-size: 1.2rem;
+            }
         }
-
-        #imgsValores {
-            width: 40%;
-            flex-direction: column;
-            margin: 0;
-            gap: 0;
-        }
-
-        #img1valor img {
-            width: 100%;
-            margin-left: 5rem;
-        }
-
-        #img2valor img {
-            width: 100%;
-            margin-top: 10rem;
-            margin-left: 2rem;
-        }
-
-        #img1valor,
-        #img2valor {
-            width: 260px;
-        }
-
-        #img1valor {
-            margin-top: 6rem;
-        }
-
-        #img2valor {
-            margin-left: 4rem;
-            z-index: -1;
-        }
-
-
-        #conteudoServicos {
-            flex-direction: column;
-            gap: 0;
-        }
-
-        #servicosGrid {
-            margin: 0;
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            justify-items: center;
-            align-items: start;
-            padding: 2rem 1rem;
-        }
-
-        .polaroid {
-            width: 100%;
-            max-width: 260px;
-            margin: 0;
-            position: static;
-        }
-
-        #textoServicos {
-            order: -1;
-            width: 100%;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        #textoServicos h2 {
-            font-size: 3rem;
-            line-height: 1.2;
-            margin: 0 auto;
-        }
-
-        #textoServicos p {
-            margin-top: 4rem;
-        }
-
-        .btnServicos {
-            font-size: 1.2rem;
-            margin: 0;
-        }
-    }
-
-    @media screen and (min-width: 2200px) {
-        #logo {
-            width: 12rem;
-        }
-
-        nav ul {
-            gap: 100px;
-        }
-
-        nav ul li a,
-        nav ul li button {
-            font-size: 1.8rem;
-        }
-
 
         #direitaHero::before {
-            width: 50rem;
-            height: 50rem;
+            width: 20rem;
+            height: 20rem;
+            margin-right: 0%;
         }
 
-        #conteudoHero #esquerdaHero h1 {
-            font-size: 5rem;
-        }
-
-        #conteudoHero #esquerdaHero h2 {
-            font-size: 3rem;
-        }
-
-        #conteudoHero #esquerdaHero .btn {
+        #direitaHero {
             width: 50%;
-            min-height: 80px;
-            font-size: 1.8rem;
-            margin-top: 40px;
+            margin: 0;
+
+            #boxImgHero {
+                margin-top: 1rem;
+                width: 80%;
+            }
+        }
+    }
+
+    #conteudoHero #esquerdaHero {
+        width: 50%;
+        margin: 0;
+        margin-bottom: 2rem;
+        z-index: 2;
+    }
+
+    #conteudoHero #esquerdaHero h1 {
+        font-size: 2.6rem;
+        margin-bottom: 20px;
+    }
+
+    #conteudoHero #esquerdaHero h2 {
+        font-size: 1.5rem;
+        text-align: justify;
+    }
+
+    #conteudoHero #esquerdaHero .btn {
+        width: 80%;
+        padding: 20px;
+        font-size: 1.2rem;
+    }
+
+    #conteudoHero #direitaHero::before {
+        width: 20rem;
+        height: 20rem;
+        margin-right: 0;
+    }
+
+    #conteudoHero #direitaHero {
+        width: 50%;
+        margin: 0;
+    }
+
+    #conteudoHero #direitaHero #boxImgHero {
+        width: 80%;
+    }
+
+
+    #sobre {
+        padding: 20px;
+        min-height: 800px;
+    }
+
+    #conteudoQuemSomos {
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+
+        #textoQuemSomos {
+            order: 1;
+            width: 70%;
+            margin: 0;
+            margin-top: 5rem;
+            text-align: center;
+
+            h2 {
+                text-align: start;
+                font-size: 2.8rem;
+                margin-bottom: 1.6rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+                text-align: justify;
+            }
         }
 
-
-        #sobre {
-            height: 100rem;
-        }
-
-        #conteudoQuemSomos #textoQuemSomos h2 {
-            font-size: 6rem;
-        }
-
-        #conteudoQuemSomos #textoQuemSomos p {
-            font-size: 2rem;
-        }
-
-
-        #conteudoValores {
-            margin-bottom: 8rem;
-        }
-
-        #conteudoValores #textoValores h2 {
-            font-size: 5rem;
-        }
-
-        #conteudoValores #textoValores p {
-            font-size: 2rem;
-        }
-
-        #conteudoValores #img1valor img {
-            width: 40%;
-        }
-
-        #conteudoValores #img2valor img {
+        #imgQuemSomos {
+            order: 2;
+            margin: 0;
+            align-items: center;
+            justify-content: center;
             width: 100%;
+            max-width: 420px;
+
+            img {
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+            }
+        }
+    }
+
+    #valores {
+        min-height: 800px;
+    }
+
+    #conteudoValores {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        gap: 40px;
+    }
+
+    #textoValores {
+        width: 70%;
+        text-align: center;
+        margin-top: 2rem;
+
+        h2 {
+            text-align: start;
+            font-size: 2.8rem;
+            margin-bottom: 1.6rem;
         }
 
-        #img1valor {
-            left: 55%
+        p {
+            font-size: 1.2rem;
+            text-align: justify;
         }
+    }
 
-        #img2valor {
-            margin-top: 20rem;
-            margin-left: 35rem;
-        }
+    #imgsValores {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 0;
+    }
+
+    #img1valor,
+    #img2valor {
+        position: relative;
+        width: 240px;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+    }
+
+    #img1valor img,
+    #img2valor img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    #img1valor img {
+        margin-top: 0;
+    }
+
+    #img2valor img {
+        margin-top: 0;
+    }
+
+    #img1valor {
+        left: auto;
+        top: auto;
+        margin-top: 1.5rem;
+    }
+
+    #img2valor {
+        left: auto;
+        top: auto;
+        margin-left: 0;
+        margin-top: 7rem;
+        z-index: -1;
+    }
 
 
-        #servicos {
-            height: 80rem;
-        }
+    #conteudoServicos {
+        flex-direction: column;
+        gap: 0;
+    }
 
-        #conteudoServicos #servicosGrid {
-            .polaroid {
-                width: 340px;
+    #servicosGrid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        justify-items: center;
+        align-items: start;
+        padding: 2rem 1rem;
+    }
+
+    .polaroid {
+        width: 100%;
+        max-width: 250px;
+        margin: 0;
+        position: static;
+    }
+
+    /* texto centralizado */
+    #textoServicos {
+        order: -1;
+        width: 100%;
+        margin-top: 2rem;
+    }
+
+    #textoServicos h2 {
+        font-size: 2.8rem;
+    }
+
+    #divBtn {
+        text-align: center;
+    }
+}
+
+@media screen and (min-width: 1020px) and (max-width: 1439px) {
+    #logo {
+        width: 7.5rem;
+    }
+
+    nav {
+        width: 100%;
+    }
+
+    nav ul {
+        margin: 0;
+    }
+
+
+    #conteudoHero {
+        padding: 20px;
+        padding-bottom: 0;
+        margin: auto;
+        margin-top: 4%;
+        justify-content: start;
+        align-items: start;
+
+        #esquerdaHero {
+            width: 45%;
+            margin: 0;
+            margin-bottom: 2rem;
+            z-index: 2;
+
+            h1 {
+                font-size: 2.8rem;
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+                text-align: justify;
+            }
+
+            .linha {
+                flex-direction: column;
 
                 p {
-                    font-size: 1.4rem;
+                    margin: 10px 0 0 0;
+                    font-size: 1rem;
                 }
             }
 
-            .polaroid:nth-child(1) {
-                left: 160px;
-            }
-
-            .polaroid:nth-child(2) {
-                left: 460px;
-            }
-
-            .polaroid:nth-child(3) {
-                left: 760px;
-            }
-
-            .polaroid:nth-child(4) {
-                top: 500px;
-                left: 140px;
-            }
-
-            .polaroid:nth-child(5) {
-                top: 520px;
-                left: 440px;
-            }
-
-            .polaroid:nth-child(6) {
-                top: 500px;
-                left: 740px;
+            .btn {
+                width: 80%;
+                padding: 20px;
+                font-size: 1.2rem;
             }
         }
 
-        #conteudoServicos #textoServicos h2 {
-            font-size: 5rem;
+        #direitaHero::before {
+            width: 25rem;
+            height: 25rem;
+            margin-right: 0%;
         }
 
-        #conteudoServicos #textoServicos p {
-            font-size: 2rem;
-        }
+        #direitaHero {
+            width: 55%;
+            margin: 0;
 
-        #conteudoServicos #textoServicos .btnServicos {
-            font-size: 2rem;
+            #boxImgHero {
+                margin: 0;
+                width: 70%;
+            }
         }
     }
+
+
+    #sobre {
+        min-height: 1000px;
+        padding: 20px;
+    }
+
+    #conteudoQuemSomos {
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+
+        #textoQuemSomos {
+            width: 50%;
+            text-align: center;
+            margin-top: 2rem;
+
+            h2 {
+                text-align: start;
+                font-size: 2.6rem;
+                margin-bottom: 1.6rem;
+            }
+
+            p {
+                font-size: 1.4rem;
+                text-align: justify;
+            }
+        }
+
+        #imgQuemSomos {
+            margin-top: 6rem;
+            align-items: start;
+            justify-content: start;
+            width: auto;
+            max-width: 40%;
+
+            img {
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+            }
+        }
+    }
+
+
+    #valores {
+        min-height: 850px;
+    }
+
+    #conteudoValores {
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    #textoValores {
+        width: 50%;
+        text-align: center;
+        margin-top: 2rem;
+
+        h2 {
+            text-align: start;
+            font-size: 2.8rem;
+            margin-bottom: 1.6rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            text-align: justify;
+        }
+    }
+
+    #imgsValores {
+        width: 40%;
+        flex-direction: column;
+        margin: 0;
+        gap: 0;
+    }
+
+    #img1valor img {
+        width: 100%;
+        margin-left: 5rem;
+    }
+
+    #img2valor img {
+        width: 100%;
+        margin-top: 10rem;
+        margin-left: 2rem;
+    }
+
+    #img1valor,
+    #img2valor {
+        width: 260px;
+    }
+
+    #img1valor {
+        margin-top: 6rem;
+    }
+
+    #img2valor {
+        margin-left: 4rem;
+        z-index: -1;
+    }
+
+
+    #conteudoServicos {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    #servicosGrid {
+        margin: 0;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        justify-items: center;
+        align-items: start;
+        padding: 2rem 1rem;
+    }
+
+    .polaroid {
+        width: 100%;
+        max-width: 260px;
+        margin: 0;
+        position: static;
+    }
+
+    #textoServicos {
+        order: -1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    #textoServicos h2 {
+        font-size: 3rem;
+        line-height: 1.2;
+        margin: 0 auto;
+    }
+
+    #textoServicos p {
+        margin-top: 4rem;
+    }
+
+    .btnServicos {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+}
+
+@media screen and (min-width: 2200px) {
+    #logo {
+        width: 12rem;
+    }
+
+    nav ul {
+        gap: 100px;
+    }
+
+    nav ul li a,
+    nav ul li button {
+        font-size: 1.8rem;
+    }
+
+
+    #direitaHero::before {
+        width: 50rem;
+        height: 50rem;
+    }
+
+    #conteudoHero #esquerdaHero h1 {
+        font-size: 5rem;
+    }
+
+    #conteudoHero #esquerdaHero h2 {
+        font-size: 3rem;
+    }
+
+    #conteudoHero #esquerdaHero .btn {
+        width: 50%;
+        min-height: 80px;
+        font-size: 1.8rem;
+        margin-top: 40px;
+    }
+
+
+    #sobre {
+        height: 100rem;
+    }
+
+    #conteudoQuemSomos #textoQuemSomos h2 {
+        font-size: 6rem;
+    }
+
+    #conteudoQuemSomos #textoQuemSomos p {
+        font-size: 2rem;
+    }
+
+
+    #conteudoValores {
+        margin-bottom: 8rem;
+    }
+
+    #conteudoValores #textoValores h2 {
+        font-size: 5rem;
+    }
+
+    #conteudoValores #textoValores p {
+        font-size: 2rem;
+    }
+
+    #conteudoValores #img1valor img {
+        width: 40%;
+    }
+
+    #conteudoValores #img2valor img {
+        width: 100%;
+    }
+
+    #img1valor {
+        left: 55%
+    }
+
+    #img2valor {
+        margin-top: 20rem;
+        margin-left: 35rem;
+    }
+
+
+    #servicos {
+        height: 80rem;
+    }
+
+    #conteudoServicos #servicosGrid {
+        .polaroid {
+            width: 340px;
+
+            p {
+                font-size: 1.4rem;
+            }
+        }
+
+        .polaroid:nth-child(1) {
+            left: 160px;
+        }
+
+        .polaroid:nth-child(2) {
+            left: 460px;
+        }
+
+        .polaroid:nth-child(3) {
+            left: 760px;
+        }
+
+        .polaroid:nth-child(4) {
+            top: 500px;
+            left: 140px;
+        }
+
+        .polaroid:nth-child(5) {
+            top: 520px;
+            left: 440px;
+        }
+
+        .polaroid:nth-child(6) {
+            top: 500px;
+            left: 740px;
+        }
+    }
+
+    #conteudoServicos #textoServicos h2 {
+        font-size: 5rem;
+    }
+
+    #conteudoServicos #textoServicos p {
+        font-size: 2rem;
+    }
+
+    #conteudoServicos #textoServicos .btnServicos {
+        font-size: 2rem;
+    }
+}

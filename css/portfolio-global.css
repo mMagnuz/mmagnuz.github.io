@@ -163,7 +163,7 @@ html.viewer-open {
     grid-column: 2;
     grid-row: 1;
     position: relative;
-    width: min(92vw, 1180px);
+    width: min(96vw, 1280px);
     height: min(84vh, 840px);
     margin: 0 auto;
     display: flex;
@@ -171,19 +171,33 @@ html.viewer-open {
     justify-content: center;
     touch-action: none;
     user-select: none;
+    overflow: visible;
 }
 
 .gallery-viewer__image {
+    position: relative;
+    z-index: 1;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
     border-radius: 20px;
     box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
     transform-origin: center center;
-    transition: transform 180ms ease, opacity 180ms ease;
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1), opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), filter 320ms cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
     user-select: none;
     -webkit-user-drag: none;
+}
+
+.gallery-viewer__image--preview {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    z-index: 0;
+    opacity: 0;
+    filter: blur(2px);
+    transform: translate3d(0px, 0px, 0) scale(0.96);
+    pointer-events: none;
 }
 
 .gallery-viewer__counter {
@@ -217,9 +231,31 @@ html.viewer-open {
     backdrop-filter: blur(10px);
 }
 
+.gallery-viewer__button img {
+    width: 1.9rem;
+    height: 1.9rem;
+    display: block;
+    pointer-events: none;
+    filter: brightness(0) invert(1);
+    transition: filter 180ms ease;
+}
+
+.gallery-viewer__prev img {
+    transform: rotate(180deg);
+}
+
+.gallery-viewer__close img {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
 .gallery-viewer__button:hover {
     transform: scale(1.06);
     background: rgba(247, 241, 232, 0.24);
+}
+
+.gallery-viewer__button:hover img {
+    filter: none;
 }
 
 .gallery-viewer__button:active {

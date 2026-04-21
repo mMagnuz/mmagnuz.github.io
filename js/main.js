@@ -396,32 +396,27 @@ function animarPagina() {
     });
 
 
-    const valoresImageTrigger1 = isMobile ? "#img1valor" : "#valores";
-    const valoresImageTrigger2 = isMobile ? "#img2valor" : "#valores";
+    const valoresImageTrigger = isMobile ? "#img1valor" : "#valores";
     const valoresImageStart = isMobile ? "top 88%" : sectionStart;
 
-    gsap.from("#img1valor", {
-        y: -150,
-        opacity: 0,
+    const tl_valores = gsap.timeline({
         scrollTrigger: {
-            trigger: valoresImageTrigger1,
+            trigger: valoresImageTrigger,
             start: valoresImageStart,
             once: true,
             invalidateOnRefresh: true
         }
     });
 
-    gsap.from("#img2valor", {
+    tl_valores.from("#img1valor", {
+        y: -150,
+        opacity: 0
+    }, 0);
+
+    tl_valores.from("#img2valor", {
         y: 150,
-        opacity: 0,
-        delay: 0.2,
-        scrollTrigger: {
-            trigger: valoresImageTrigger2,
-            start: valoresImageStart,
-            once: true,
-            invalidateOnRefresh: true
-        }
-    });
+        opacity: 0
+    }, 0);
 
 
     const polaroids = Array.from(document.querySelectorAll(".polaroid"));
@@ -432,21 +427,26 @@ function animarPagina() {
                 ? -Math.min(window.innerWidth * 0.55, 280)
                 : Math.min(window.innerWidth * 0.55, 280);
 
-            gsap.fromTo(polaroid, {
+            gsap.set(polaroid, {
                 x: fromX,
                 scale: 0.98,
                 opacity: 0
-            }, {
-                x: 0,
-                scale: 1,
-                opacity: 1,
-                duration: 1,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: polaroid,
-                    start: "top 92%",
-                    once: true,
-                    invalidateOnRefresh: true
+            });
+
+            ScrollTrigger.create({
+                trigger: polaroid,
+                start: "top 88%",
+                once: true,
+                invalidateOnRefresh: true,
+                onEnter: () => {
+                    gsap.to(polaroid, {
+                        x: 0,
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.9,
+                        ease: "power2.out",
+                        overwrite: "auto"
+                    });
                 }
             });
         });
@@ -475,6 +475,19 @@ function animarPagina() {
                 opacity: 1,
                 duration: 0.3
             }, index * 0.1);
+
+            // Animação de flutuação contínua para desktop
+            const floatDistance = 6 + index * 1.5;
+            const goesUpFirst = index < 3;
+            gsap.to(polaroid, {
+                keyframes: goesUpFirst
+                    ? [{ y: -floatDistance }, { y: floatDistance }, { y: -floatDistance }]
+                    : [{ y: floatDistance }, { y: -floatDistance }, { y: floatDistance }],
+                duration: 4 + (index % 3) * 0.45,
+                ease: "sine.inOut",
+                repeat: -1,
+                delay: index * 0.1
+            });
         });
     }
 }

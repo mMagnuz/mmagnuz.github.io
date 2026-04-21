@@ -46,13 +46,19 @@ function initPortfolioGalleryLightbox() {
     viewer.innerHTML = `
         <div class="gallery-viewer__backdrop" data-close></div>
         <div class="gallery-viewer__chrome" role="dialog" aria-modal="true" aria-label="Visualizador de fotos">
-            <button type="button" class="gallery-viewer__button gallery-viewer__close" aria-label="Fechar visualizador">x</button>
-            <button type="button" class="gallery-viewer__button gallery-viewer__prev" aria-label="Foto anterior">&lt;</button>
+            <button type="button" class="gallery-viewer__button gallery-viewer__close" aria-label="Fechar visualizador">
+                <img src="icon/cruz.svg" alt="" aria-hidden="true" />
+            </button>
+            <button type="button" class="gallery-viewer__button gallery-viewer__prev" aria-label="Foto anterior">
+                <img src="icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
+            </button>
             <figure class="gallery-viewer__frame">
                 <img class="gallery-viewer__image" alt="" />
                 <figcaption class="gallery-viewer__counter"></figcaption>
             </figure>
-            <button type="button" class="gallery-viewer__button gallery-viewer__next" aria-label="Proxima foto">&gt;</button>
+            <button type="button" class="gallery-viewer__button gallery-viewer__next" aria-label="Proxima foto">
+                <img src="icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
+            </button>
             <div class="gallery-viewer__tools" aria-label="Controles de zoom">
                 <button type="button" class="gallery-viewer__button gallery-viewer__zoom-out" aria-label="Diminuir zoom">-</button>
                 <button type="button" class="gallery-viewer__button gallery-viewer__zoom-reset" aria-label="Redefinir zoom">1x</button>
@@ -73,6 +79,11 @@ function initPortfolioGalleryLightbox() {
     const zoomInButton = viewer.querySelector(".gallery-viewer__zoom-in");
     const backdrop = viewer.querySelector(".gallery-viewer__backdrop");
     const frame = viewer.querySelector(".gallery-viewer__frame");
+    const previewImageElement = document.createElement("img");
+    previewImageElement.className = "gallery-viewer__image gallery-viewer__image--preview";
+    previewImageElement.alt = "";
+    previewImageElement.setAttribute("aria-hidden", "true");
+    frame.insertBefore(previewImageElement, imageElement);
 
     let currentIndex = 0;
     let zoom = 1;
@@ -81,6 +92,8 @@ function initPortfolioGalleryLightbox() {
     let isOpen = false;
     let gesture = null;
     const activePointers = new Map();
+    let switchToken = 0;
+    let swipePreviewIndex = null;
 
     const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
     const wrapIndex = (index) => (index + galleryImages.length) % galleryImages.length;
@@ -91,9 +104,41 @@ function initPortfolioGalleryLightbox() {
         counterElement.textContent = `${current} / ${total}`;
     };
 
+    const getImageData = (index) => {
+        const wrappedIndex = wrapIndex(index);
+        const source = galleryImages[wrappedIndex];
+        return {
+            wrappedIndex,
+            src: source.currentSrc || source.src,
+            alt: source.alt || `Imagem ${wrappedIndex + 1}`
+        };
+    };
+
     const applyTransform = (animate = true) => {
         imageElement.style.transition = animate ? "transform 180ms ease, opacity 180ms ease" : "none";
         imageElement.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`;
+    };
+
+    const applySwipeMainImageStyle = (dx) => {
+        const widthFactor = Math.max(frame.clientWidth * 0.62, 260);
+        const progress = clamp(Math.abs(dx) / widthFactor, 0, 1);
+        const opacity = 1 - progress * 0.48;
+        const blurPx = progress * 1.2;
+
+        imageElement.style.transition = "none";
+        imageElement.style.opacity = String(opacity);
+        imageElement.style.filter = `blur(${blurPx}px)`;
+    };
+
+    const resetSwipeMainImageStyle = (animate = true) => {
+        if (animate) {
+            imageElement.style.transition = "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms cubic-bezier(0.22, 1, 0.36, 1)";
+        } else {
+            imageElement.style.transition = "none";
+        }
+
+        imageElement.style.opacity = "1";
+        imageElement.style.filter = "blur(0px)";
     };
 
     const resetTransform = (animate = false) => {
@@ -101,33 +146,89 @@ function initPortfolioGalleryLightbox() {
         panX = 0;
         panY = 0;
         applyTransform(animate);
+        resetSwipeMainImageStyle(animate);
+    };
+
+    const clearSwipePreview = (animate = true) => {
+        if (animate) {
+            previewImageElement.style.transition = "transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), filter 220ms cubic-bezier(0.22, 1, 0.36, 1)";
+        } else {
+            previewImageElement.style.transition = "none";
+        }
+
+        previewImageElement.style.opacity = "0";
+        previewImageElement.style.transform = "translate3d(0px, 0px, 0) scale(0.96)";
+        previewImageElement.style.filter = "blur(2px)";
+        swipePreviewIndex = null;
+    };
+
+    const updateSwipePreview = (dx) => {
+        if (zoom > 1) return;
+
+        const absDx = Math.abs(dx);
+        if (absDx < 8) {
+            clearSwipePreview(false);
+            return;
+        }
+
+        const direction = dx < 0 ? 1 : -1;
+        const targetIndex = wrapIndex(currentIndex + direction);
+        const { src, alt } = getImageData(targetIndex);
+
+        if (swipePreviewIndex !== targetIndex) {
+            swipePreviewIndex = targetIndex;
+            previewImageElement.src = src;
+            previewImageElement.alt = alt;
+        }
+
+        const widthFactor = Math.max(frame.clientWidth * 0.38, 180);
+        const progress = clamp(absDx / widthFactor, 0, 1);
+        const offsetX = direction > 0
+            ? (1 - progress) * 96
+            : -(1 - progress) * 96;
+        const scale = 0.94 + progress * 0.06;
+        const opacity = 0.12 + progress * 0.88;
+
+        previewImageElement.style.transition = "none";
+        previewImageElement.style.opacity = String(opacity);
+        previewImageElement.style.transform = `translate3d(${offsetX}px, 0, 0) scale(${scale})`;
+        previewImageElement.style.filter = `blur(${(1 - progress) * 2}px)`;
     };
 
     const setImageFromIndex = (index) => {
-        currentIndex = wrapIndex(index);
-        const source = galleryImages[currentIndex];
+        const token = ++switchToken;
+        const nextIndex = wrapIndex(index);
+        const { src, alt } = getImageData(nextIndex);
+        clearSwipePreview(false);
+        resetSwipeMainImageStyle(false);
         viewer.classList.add("is-switching");
-        imageElement.style.opacity = "0";
+        const preloadImage = new Image();
+        preloadImage.decoding = "async";
 
         let loaded = false;
-        const handleImageLoad = () => {
-            if (loaded) return;
+        const handleImageReady = () => {
+            if (loaded || token !== switchToken) return;
             loaded = true;
+
+            currentIndex = nextIndex;
+            imageElement.alt = alt;
+            imageElement.src = src;
             updateCounter();
             resetTransform(false);
+
+            imageElement.style.transition = "opacity 360ms cubic-bezier(0.22, 1, 0.36, 1), filter 360ms cubic-bezier(0.22, 1, 0.36, 1)";
+            imageElement.style.filter = "blur(0px)";
             requestAnimationFrame(() => {
                 imageElement.style.opacity = "1";
                 viewer.classList.remove("is-switching");
             });
         };
 
-        imageElement.onload = handleImageLoad;
+        preloadImage.onload = handleImageReady;
+        preloadImage.src = src;
 
-        imageElement.src = source.currentSrc || source.src;
-        imageElement.alt = source.alt || `Imagem ${currentIndex + 1}`;
-
-        if (imageElement.complete) {
-            handleImageLoad();
+        if (preloadImage.complete && preloadImage.naturalWidth > 0) {
+            handleImageReady();
         }
     };
 
@@ -157,6 +258,7 @@ function initPortfolioGalleryLightbox() {
         document.documentElement.classList.remove("viewer-open");
         viewer.classList.remove("is-open");
         resetTransform(false);
+        clearSwipePreview(false);
     };
 
     const zoomImage = (nextZoom) => {
@@ -279,6 +381,8 @@ function initPortfolioGalleryLightbox() {
             panX = dx;
             panY = dy * 0.25;
             applyTransform(false);
+            applySwipeMainImageStyle(dx);
+            updateSwipePreview(dx);
         }
     });
 
@@ -292,8 +396,11 @@ function initPortfolioGalleryLightbox() {
         if (gesture.type === "swipe") {
             const dx = event.clientX - gesture.startX;
             const dy = event.clientY - gesture.startY;
+            const swipeCommitDistance = Math.max(95, frame.clientWidth * 0.12);
 
-            if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy)) {
+            if (Math.abs(dx) > swipeCommitDistance && Math.abs(dx) > Math.abs(dy)) {
+                clearSwipePreview(false);
+                resetSwipeMainImageStyle(false);
                 if (dx < 0) {
                     showNext();
                 } else {
@@ -303,6 +410,8 @@ function initPortfolioGalleryLightbox() {
                 panX = 0;
                 panY = 0;
                 applyTransform(true);
+                resetSwipeMainImageStyle(true);
+                clearSwipePreview(true);
             }
         }
 
