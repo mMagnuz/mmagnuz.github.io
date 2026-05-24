@@ -5,7 +5,7 @@ const MOBILE_BREAKPOINT = 319;
 const TABLET_BREAKPOINT = 1019;
 
 // Enable ScrollTrigger markers for debugging (toggle off after inspection)
-const DEBUG_SCROLL_MARKERS = true;
+const DEBUG_SCROLL_MARKERS = false;
 
 let smoother = null;
 let _smootherSyncRaf = null;

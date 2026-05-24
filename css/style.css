@@ -1118,13 +1118,6 @@ nav {
     }
 }
 
-.ctaFinalDestaque {
-    letter-spacing: 0.15em;
-    font-size: clamp(2.6rem, 4.4vw, 4.6rem);
-    -webkit-text-stroke: 2.7px #1f1d1f;
-    color: transparent;
-}
-
 .btnCtaFinal {
     &:hover {
         background-color: #161516;
