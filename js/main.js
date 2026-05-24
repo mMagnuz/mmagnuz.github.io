@@ -4,10 +4,107 @@ gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 const MOBILE_BREAKPOINT = 319;
 const TABLET_BREAKPOINT = 1019;
 
+// Enable ScrollTrigger markers for debugging (toggle off after inspection)
+const DEBUG_SCROLL_MARKERS = true;
+
 let smoother = null;
+let _smootherSyncRaf = null;
+
+// Global handlers to avoid uncaught promise/errors stopping initialization
+window.addEventListener('unhandledrejection', (ev) => {
+    try { console.warn('Unhandled promise rejection:', ev.reason); } catch (e) { }
+});
+window.addEventListener('error', (ev) => {
+    try { console.warn('Runtime error:', ev.error || ev.message); } catch (e) { }
+});
 
 function getScrollY() {
     return window.scrollY || window.pageYOffset || 0;
+}
+
+// Small utilities: debounce and combined resize/orientation listener
+function debounce(fn, wait = 150) {
+    let t = null;
+    return function (...args) {
+        clearTimeout(t);
+        t = window.setTimeout(() => fn.apply(this, args), wait);
+    };
+}
+
+function addResizeAndOrientation(handler, wait = 150) {
+    const debounced = debounce(handler, wait);
+    window.addEventListener('resize', debounced);
+    window.addEventListener('orientationchange', debounced);
+    return () => {
+        window.removeEventListener('resize', debounced);
+        window.removeEventListener('orientationchange', debounced);
+    };
+}
+
+// ScrollTrigger defaults helper to avoid repeating common options
+function scrollTriggerOpts(overrides = {}) {
+    const defaults = {
+        invalidateOnRefresh: true
+    };
+    if (DEBUG_SCROLL_MARKERS) defaults.markers = true;
+    return Object.assign({}, defaults, overrides);
+}
+
+// ScrollSmoother helpers: create/destroy and toggle based on viewport/profile
+function createSmoother() {
+    if (typeof ScrollSmoother === 'undefined') return;
+    if (smoother) return;
+
+    const motion = getMotionProfile();
+    try {
+        smoother = ScrollSmoother.create({
+            smooth: Math.max(0.6, 0.9 * motion.durationScale),
+            effects: true,
+            normalizeScroll: true,
+            smoothTouch: 0.12
+        });
+    } catch (e) {
+        smoother = null;
+    }
+    try { ScrollTrigger.refresh(); } catch (e) { }
+    // start a RAF loop to keep ScrollTrigger in sync with smoother
+    startSmootherSyncLoop();
+}
+
+function destroySmoother() {
+    if (!smoother) return;
+    try {
+        smoother.kill();
+    } catch (e) { }
+    smoother = null;
+    try { ScrollTrigger.refresh(); } catch (e) { }
+    stopSmootherSyncLoop();
+}
+
+function startSmootherSyncLoop() {
+    if (_smootherSyncRaf || typeof ScrollTrigger === 'undefined') return;
+    const loop = () => {
+        try { ScrollTrigger.update(); } catch (e) { }
+        _smootherSyncRaf = requestAnimationFrame(loop);
+    };
+    _smootherSyncRaf = requestAnimationFrame(loop);
+}
+
+function stopSmootherSyncLoop() {
+    if (!_smootherSyncRaf) return;
+    cancelAnimationFrame(_smootherSyncRaf);
+    _smootherSyncRaf = null;
+}
+
+function toggleSmoother() {
+    const motion = getMotionProfile();
+    // don't enable on reduced-motion or low-performance devices
+    if (motion.reduce || motion.lowPerformance || isMobileViewport()) {
+        destroySmoother();
+        return;
+    }
+
+    createSmoother();
 }
 
 function isPhoneViewport() {
@@ -124,8 +221,7 @@ function initNavbarScroll() {
 
     updateNavbar();
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", syncNavbarWithViewport);
-    window.addEventListener("orientationchange", syncNavbarWithViewport);
+    addResizeAndOrientation(syncNavbarWithViewport, 150);
 
     menuToggle?.addEventListener("change", () => {
         window.requestAnimationFrame(updateNavbar);
@@ -202,8 +298,7 @@ function initNavSectionHighlight() {
 
     updateActiveLink();
     window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-    window.addEventListener("orientationchange", requestUpdate);
+    addResizeAndOrientation(requestUpdate, 150);
 }
 
 // ================= INIT =================
@@ -220,6 +315,9 @@ document.addEventListener("DOMContentLoaded", () => {
     initDepoimentos();
     initFaqAccordion();
 
+    // Garantir smoother configurado antes das animações iniciarem
+    toggleSmoother();
+
     document.fonts.ready.then(() => {
         animarPagina();
         refreshScrollTriggers();
@@ -228,8 +326,9 @@ document.addEventListener("DOMContentLoaded", () => {
         window.requestAnimationFrame(() => {
             restoreHashScrollImmediate();
             refreshScrollTriggers();
+            playAnimationsOnReload();
         });
-    });
+    }).catch(() => { });
 
     window.addEventListener("load", () => {
         refreshScrollTriggers();
@@ -237,20 +336,81 @@ document.addEventListener("DOMContentLoaded", () => {
         // Fazer um refresh adicional após o load para garantir sincronização
         window.requestAnimationFrame(() => {
             refreshScrollTriggers();
+            playAnimationsOnReload();
         });
     });
+    // Ativa/desativa ScrollSmoother conforme viewport e atualiza triggers em resize
+    toggleSmoother();
+    addResizeAndOrientation(() => { refreshScrollTriggers(); toggleSmoother(); }, 150);
 
-    let resizeTimer;
-    window.addEventListener("resize", () => {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            refreshScrollTriggers();
-        }, 150);
-    });
+    // Garantir que animações disparem ao recarregar independente da posição
+    function playAnimationsOnReload() {
+        const motion = getMotionProfile();
+        if (motion.reduce) return;
 
-    window.addEventListener("orientationchange", () => {
-        refreshScrollTriggers();
-    });
+        window.requestAnimationFrame(() => {
+            try { ScrollTrigger.refresh(); ScrollTrigger.update(); } catch (e) { }
+            const triggers = (ScrollTrigger.getAll && ScrollTrigger.getAll()) || [];
+            const isMostlyInViewport = (el, minRatio = 0.15) => {
+                if (!el || !el.getBoundingClientRect) return false;
+                const r = el.getBoundingClientRect();
+                const vh = window.innerHeight || document.documentElement.clientHeight;
+                const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+                const h = r.height || 1;
+                return (visible / h) >= minRatio;
+            };
+
+            // Determine default visible thresholds depending on device size
+            // Increase strictness on mobile/tablet to avoid premature firing
+            const defaultMin = isMobileViewport() ? 0.55 : 0.12;
+
+            triggers.forEach((st) => {
+                try {
+                    const triggerEl = st.trigger || st.scroller || null;
+                    // for important larger sections (like 'sobre') require more visible area
+                    const specialLargeSection = triggerEl && (triggerEl.id === 'sobre' || triggerEl.id === 'valores');
+                    const minRatio = specialLargeSection
+                        ? (isMobileViewport() ? 0.75 : 0.25)
+                        : defaultMin;
+                    const inView = triggerEl ? isMostlyInViewport(triggerEl, minRatio) : false;
+                    const anim = st.animation;
+
+                    if (anim) {
+                        const vars = st.vars || st._vars || {};
+                        const isScrub = Object.prototype.hasOwnProperty.call(vars, 'scrub');
+
+                        if (isScrub) {
+                            // Scrubbed animations should reflect scroll position
+                            try {
+                                const prog = (typeof st.progress === 'number') ? st.progress : (st.progress && st.progress());
+                                if (typeof anim.progress === 'function') anim.progress(prog || 0);
+                                if (typeof anim.pause === 'function') anim.pause();
+                            } catch (e) { }
+                        } else if (inView) {
+                            try {
+                                if (typeof anim.restart === 'function') anim.restart(true);
+                                if (typeof anim.play === 'function') anim.play();
+                            } catch (e) { }
+                        } else {
+                            try {
+                                if (typeof anim.pause === 'function') anim.pause();
+                                if (typeof anim.seek === 'function') anim.seek(0);
+                                if (typeof anim.progress === 'function') anim.progress(0);
+                            } catch (e) { }
+                        }
+                    } else {
+                        const vars = st.vars || st._vars || {};
+                        if (inView) {
+                            if (typeof vars.onEnter === 'function') vars.onEnter();
+                            if (typeof vars.onEnterBack === 'function') vars.onEnterBack();
+                        }
+                    }
+                } catch (e) { }
+            });
+
+            try { ScrollTrigger.update(); } catch (e) { }
+        });
+    }
 });
 
 // =============== ANCHORS ================
@@ -406,14 +566,13 @@ function initPortfolio() {
 
     const portfolioStart = isPhoneViewport() ? "top 62%" : isMobileViewport() ? "top 70%" : "top 78%";
 
-    ScrollTrigger.create({
+    ScrollTrigger.create(scrollTriggerOpts({
         trigger: portfolioSection,
         start: portfolioStart,
         onEnter: playPortfolio,
         onEnterBack: playPortfolio,
-        once: true,
-        invalidateOnRefresh: true
-    });
+        once: true
+    }));
 
     const viewportThreshold = isPhoneViewport() ? 0.35 : 0.15;
     if (ScrollTrigger.isInViewport(portfolioSection, viewportThreshold)) {
@@ -573,11 +732,10 @@ function initDepoimentos() {
     viewport.addEventListener("pointercancel", endPointerGesture);
     viewport.addEventListener("pointerleave", endPointerGesture);
 
-    window.addEventListener("resize", updateViewportHeight);
-    window.addEventListener("orientationchange", updateViewportHeight);
+    addResizeAndOrientation(updateViewportHeight, 150);
 
     if (document.fonts?.ready) {
-        document.fonts.ready.then(updateViewportHeight);
+        document.fonts.ready.then(updateViewportHeight).catch(() => { });
     }
 
     updateActiveDepoimento(0);
@@ -678,8 +836,7 @@ function initFaqAccordion() {
         });
     };
 
-    window.addEventListener("resize", syncOpenHeights);
-    window.addEventListener("orientationchange", syncOpenHeights);
+    addResizeAndOrientation(syncOpenHeights, 150);
 }
 
 // ============== ANIMAÇÕES ===============
@@ -717,13 +874,12 @@ function animarPagina() {
             gsap.set(split.chars, { y: Math.round(40 * motion.distanceScale), opacity: 0 });
 
             gsap.timeline({
-                scrollTrigger: {
+                scrollTrigger: scrollTriggerOpts({
                     trigger: textoA,
                     start: textStart,
                     toggleActions: "play none none none",
-                    once: true,
-                    invalidateOnRefresh: true
-                }
+                    once: true
+                })
             }).to(split.chars, {
                 y: 0,
                 opacity: 1,
@@ -738,13 +894,12 @@ function animarPagina() {
                 autoAlpha: 1,
                 duration: 0.35 * motion.durationScale,
                 ease: "power2.out",
-                scrollTrigger: {
+                scrollTrigger: scrollTriggerOpts({
                     trigger: textoA,
                     start: textStart,
                     toggleActions: "play none none none",
-                    once: true,
-                    invalidateOnRefresh: true
-                }
+                    once: true
+                })
             });
         }
     });
@@ -759,30 +914,29 @@ function animarPagina() {
 
     gsap.to("#direitaHero", {
         y: Math.round(100 * motion.distanceScale),
-        scrollTrigger: {
+        scrollTrigger: scrollTriggerOpts({
             trigger: "#sobre",
             start: "top bottom",
             end: "center center",
             scrub: motion.scrub
-        }
+        })
     });
 
 
-    const quemSomosImageTrigger = isMobile ? "#imgQuemSomos" : "#sobre";
-    const quemSomosImageStart = isMobile ? "top 88%" : sectionStart;
+    const quemSomosImageTrigger = isTablet ? "#imgQuemSomos" : "#sobre";
+    const quemSomosImageStart = isTablet ? "top 96%" : sectionStart;
 
     gsap.from("#imgQuemSomos", {
         y: Math.round(100 * motion.distanceScale),
         opacity: 0,
         duration: 1 * motion.durationScale,
         filter: "blur(6px)",
-        scrollTrigger: {
+        scrollTrigger: scrollTriggerOpts({
             trigger: quemSomosImageTrigger,
             start: quemSomosImageStart,
             ease: "power2.inOut",
-            once: true,
-            invalidateOnRefresh: true
-        }
+            once: true
+        })
     });
 
     if (!motion.reduce) {
@@ -804,26 +958,24 @@ function animarPagina() {
             duration: 1.05 * motion.durationScale,
             ease: "power3.out",
             overwrite: "auto",
-            scrollTrigger: {
+            scrollTrigger: scrollTriggerOpts({
                 trigger: "#ctaFinalImgBox",
                 start: isPhoneViewport() ? "top 88%" : isMobile ? "top 84%" : "top 80%",
                 toggleActions: "play none none none",
                 once: true,
-                invalidateOnRefresh: true,
                 onEnter: () => ctaFloatTween.play()
-            }
+            })
         });
 
-        ScrollTrigger.create({
+        ScrollTrigger.create(scrollTriggerOpts({
             trigger: "#ctaFinal",
             start: "top bottom",
             end: "bottom top",
-            invalidateOnRefresh: true,
             onEnter: () => ctaFloatTween.resume(),
             onEnterBack: () => ctaFloatTween.resume(),
             onLeave: () => ctaFloatTween.pause(),
             onLeaveBack: () => ctaFloatTween.pause()
-        });
+        }));
 
         if (ScrollTrigger.isInViewport("#ctaFinal", 0.25)) {
             gsap.set("#ctaFinalImgBox", { y: 0, autoAlpha: 1 });
@@ -834,16 +986,15 @@ function animarPagina() {
     }
 
 
-    const valoresImageTrigger = isMobile ? "#img1valor" : "#valores";
-    const valoresImageStart = isMobile ? "top 88%" : sectionStart;
+    const valoresImageTrigger = isTablet ? "#img1valor" : "#valores";
+    const valoresImageStart = isTablet ? "top 96%" : sectionStart;
 
     const tl_valores = gsap.timeline({
-        scrollTrigger: {
+        scrollTrigger: scrollTriggerOpts({
             trigger: valoresImageTrigger,
             start: valoresImageStart,
-            once: true,
-            invalidateOnRefresh: true
-        }
+            once: true
+        })
     });
 
     tl_valores.from("#img1valor", {
@@ -871,11 +1022,10 @@ function animarPagina() {
                 opacity: 0
             });
 
-            ScrollTrigger.create({
+            ScrollTrigger.create(scrollTriggerOpts({
                 trigger: polaroid,
                 start: "top 88%",
                 once: true,
-                invalidateOnRefresh: true,
                 onEnter: () => {
                     gsap.to(polaroid, {
                         x: 0,
@@ -886,16 +1036,15 @@ function animarPagina() {
                         overwrite: "auto"
                     });
                 }
-            });
+            }));
         });
     } else {
         const tl = gsap.timeline({
-            scrollTrigger: {
+            scrollTrigger: scrollTriggerOpts({
                 trigger: "#servicosGrid",
                 start: servicesStart,
-                once: true,
-                invalidateOnRefresh: true
-            }
+                once: true
+            })
         });
 
         const floatTweens = [];
@@ -948,7 +1097,7 @@ function animarPagina() {
             }
         });
 
-        ScrollTrigger.create({
+        ScrollTrigger.create(scrollTriggerOpts({
             trigger: "#servicos",
             start: "top bottom",
             end: "bottom top",
@@ -956,7 +1105,7 @@ function animarPagina() {
             onEnterBack: playFloatTweens,
             onLeave: pauseFloatTweens,
             onLeaveBack: pauseFloatTweens
-        });
+        }));
 
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
@@ -980,7 +1129,7 @@ function initMobileMenu() {
     };
 
     menuToggle.addEventListener("change", syncMenuState);
-    window.addEventListener("resize", syncMenuState);
+    addResizeAndOrientation(syncMenuState, 150);
     syncMenuState();
 }
 
