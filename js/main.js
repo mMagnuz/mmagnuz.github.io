@@ -839,6 +839,194 @@ function initFaqAccordion() {
     addResizeAndOrientation(syncOpenHeights, 150);
 }
 
+// Mobile carousel for polaroids: creates a looping, draggable track showing 3 items
+function initPolaroidCarouselMobile(containerSelector = '#servicosGrid') {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+
+    // already initialized?
+    if (container.querySelector('.polaroid-track')) return;
+
+    const originals = Array.from(container.querySelectorAll('.polaroid'));
+    const originalCount = originals.length;
+    if (originalCount < 2) return;
+
+    const motion = getMotionProfile();
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // create track and move originals into it
+    const track = document.createElement('div');
+    track.className = 'polaroid-track';
+
+    const prependClones = originals.map((item) => item.cloneNode(true)).reverse();
+    prependClones.forEach((clone) => {
+        clone.classList.add('cloned');
+        track.appendChild(clone);
+    });
+
+    originals.forEach((el) => track.appendChild(el));
+
+    originals.forEach((item) => {
+        const clone = item.cloneNode(true);
+        clone.classList.add('cloned');
+        track.appendChild(clone);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(track);
+
+    container.style.overflowX = 'auto';
+    container.style.overflowY = 'hidden';
+    container.style.scrollBehavior = 'auto';
+    container.style.touchAction = 'pan-x';
+    container.style.WebkitOverflowScrolling = 'touch';
+    container.style.overscrollBehaviorX = 'contain';
+
+    let items = Array.from(track.children);
+    let step = 0;
+    let segmentWidth = 0;
+    let lastFrameTime = 0;
+    let lastManualScrollTime = 0;
+    let isMeasuring = false;
+    let isPointerDown = false;
+    let rafId = null;
+    let autoScrollEnabled = !reducedMotion;
+    const speed = motion.lowPerformance ? 28 : 40;
+    const baseRotations = [-7, 4, -2, 5, -4, 6];
+
+    const getGap = () => {
+        const styles = window.getComputedStyle(track);
+        return parseFloat(styles.gap || styles.columnGap || '0') || 0;
+    };
+
+    const updateCenterHighlight = () => {
+        const containerRect = container.getBoundingClientRect();
+        const centerX = containerRect.left + (container.clientWidth / 2);
+        let closestItem = null;
+        let closestDistance = Number.POSITIVE_INFINITY;
+
+        items.forEach((item) => {
+            const rect = item.getBoundingClientRect();
+            const itemCenter = rect.left + (rect.width / 2);
+            const distance = Math.abs(itemCenter - centerX);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestItem = item;
+            }
+        });
+
+        items.forEach((item) => {
+            item.classList.toggle('is-center', item === closestItem);
+        });
+    };
+
+    const normalizeScroll = () => {
+        if (!segmentWidth) return;
+
+        const min = segmentWidth;
+        const max = segmentWidth * 2;
+
+        if (container.scrollLeft < min) {
+            isMeasuring = true;
+            container.scrollLeft += segmentWidth;
+            isMeasuring = false;
+        } else if (container.scrollLeft >= max) {
+            isMeasuring = true;
+            container.scrollLeft -= segmentWidth;
+            isMeasuring = false;
+        }
+    };
+
+    const measureLayout = () => {
+        const firstOriginal = track.querySelector('.polaroid:not(.cloned)');
+        if (!firstOriginal) return;
+
+        const gap = getGap();
+        const availableWidth = Math.max(container.clientWidth - 32, 0);
+        const cardWidth = Math.max(118, Math.floor(availableWidth / 3) + 8);
+
+        track.style.setProperty('--polaroid-mobile-width', `${cardWidth}px`);
+
+        items = Array.from(track.children);
+        items.forEach((item, index) => {
+            const rotation = baseRotations[index % originalCount] || 0;
+            item.style.setProperty('--polaroid-rotation', `${rotation}deg`);
+        });
+
+        step = cardWidth + gap;
+        segmentWidth = step * originalCount;
+
+        isMeasuring = true;
+        container.scrollLeft = segmentWidth;
+        isMeasuring = false;
+
+        updateCenterHighlight();
+    };
+
+    const onScroll = () => {
+        if (!isMeasuring) {
+            lastManualScrollTime = performance.now();
+        }
+        updateCenterHighlight();
+    };
+
+    const onPointerDown = () => {
+        isPointerDown = true;
+        lastManualScrollTime = performance.now();
+    };
+
+    const onPointerUp = () => {
+        isPointerDown = false;
+        lastManualScrollTime = performance.now();
+    };
+
+    const frame = (timestamp) => {
+        if (!lastFrameTime) {
+            lastFrameTime = timestamp;
+        }
+
+        const deltaSeconds = (timestamp - lastFrameTime) / 1000;
+        lastFrameTime = timestamp;
+
+        const manualCooldown = performance.now() - lastManualScrollTime;
+        const canAutoScroll = autoScrollEnabled && !document.hidden && !isPointerDown && manualCooldown > 180;
+
+        if (canAutoScroll && segmentWidth > 0) {
+            isMeasuring = true;
+            container.scrollLeft += speed * deltaSeconds;
+            normalizeScroll();
+            isMeasuring = false;
+        }
+
+        updateCenterHighlight();
+        rafId = window.requestAnimationFrame(frame);
+    };
+
+    container.addEventListener('scroll', onScroll, { passive: true });
+    container.addEventListener('pointerdown', onPointerDown, { passive: true });
+    container.addEventListener('pointerup', onPointerUp, { passive: true });
+    container.addEventListener('pointercancel', onPointerUp, { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+        lastManualScrollTime = performance.now();
+    });
+
+    addResizeAndOrientation(() => {
+        items = Array.from(track.children);
+        window.requestAnimationFrame(measureLayout);
+    }, 150);
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            measureLayout();
+            lastFrameTime = 0;
+            if (!rafId) {
+                rafId = window.requestAnimationFrame(frame);
+            }
+        });
+    });
+}
+
 // ============== ANIMAÇÕES ===============
 function animarPagina() {
     const textosAnim = document.querySelectorAll(".textoAnimado");
@@ -1010,34 +1198,9 @@ function animarPagina() {
 
     const polaroids = Array.from(document.querySelectorAll(".polaroid"));
 
-    if (isMobile) {
-        polaroids.forEach((polaroid, index) => {
-            const fromX = index % 2 === 0
-                ? -Math.min(window.innerWidth * 0.55, 280)
-                : Math.min(window.innerWidth * 0.55, 280);
-
-            gsap.set(polaroid, {
-                x: fromX,
-                scale: 0.98,
-                opacity: 0
-            });
-
-            ScrollTrigger.create(scrollTriggerOpts({
-                trigger: polaroid,
-                start: "top 88%",
-                once: true,
-                onEnter: () => {
-                    gsap.to(polaroid, {
-                        x: 0,
-                        scale: 1,
-                        opacity: 1,
-                        duration: 0.9 * motion.durationScale,
-                        ease: "power2.out",
-                        overwrite: "auto"
-                    });
-                }
-            }));
-        });
+    // initialize carousel for narrow viewports (match CSS breakpoint)
+    if (window.matchMedia('(max-width: 767px)').matches) {
+        initPolaroidCarouselMobile('#servicosGrid');
     } else {
         const tl = gsap.timeline({
             scrollTrigger: scrollTriggerOpts({
@@ -1144,3 +1307,62 @@ function closeMobileMenu() {
     document.body.classList.remove("menu-open");
     nav?.classList.remove("hide");
 }
+
+// ============== TRACKING ================
+function trackAnalyticsClick(eventName, category, label) {
+    if (typeof gtag !== 'function') return;
+
+    gtag('event', eventName, {
+        event_category: category,
+        event_label: label,
+        value: 1
+    });
+}
+
+function bindTrackingBySelector(selector, configFactory) {
+    const elements = Array.from(document.querySelectorAll(selector));
+    if (!elements.length) return;
+
+    elements.forEach((element, index) => {
+        element.addEventListener('click', () => {
+            const config = configFactory(element, index);
+            trackAnalyticsClick(config.eventName, config.category, config.label);
+        });
+    });
+}
+
+bindTrackingBySelector('.btn', () => ({
+    eventName: 'clique_agendamento',
+    category: 'Botoes',
+    label: 'Botao de agendamento no Hero'
+}));
+
+bindTrackingBySelector('.btnServicos', (_, index) => ({
+    eventName: 'clique_agendamento',
+    category: 'Botoes',
+    label: index === 0
+        ? 'Botao de agendamento na Secao de Servicos'
+        : 'Botao de agendamento no CTA Final'
+}));
+
+bindTrackingBySelector('#rodape a', (link) => {
+    const text = (link.textContent || '').replace(/\s+/g, ' ').trim();
+    const href = link.getAttribute('href') || 'sem-link';
+
+    return {
+        eventName: 'clique_footer',
+        category: 'Footer',
+        label: text ? `Footer - ${text}` : `Footer - ${href}`
+    };
+});
+
+bindTrackingBySelector('#cardsPort .portfolio', (card, index) => {
+    const title = card.querySelector('.portfolio-caption strong')?.textContent?.trim();
+    const label = title || `Card ${index + 1}`;
+
+    return {
+        eventName: 'clique_portfolio',
+        category: 'Portfolio',
+        label: `Portfolio - ${label}`
+    };
+});

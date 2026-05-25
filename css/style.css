@@ -1413,11 +1413,10 @@ nav {
 
                 h2 {
 
-                    font-size: 24px;
-                    line-height: 1.60;
-                    font-weight: 350;
+                    font-size: 1.4rem;
+                    line-height: 1.40;
+                    font-weight: 450;
                     color: #bbb9bb;
-                    max-width: 38ch;
                     margin: 0 auto;
                 }
 
@@ -1448,6 +1447,10 @@ nav {
                     line-height: 1.15;
                     color: #211E1E;
                     margin-bottom: 20px;
+                }
+
+                p {
+                    font-size: .9rem;
                 }
             }
 
@@ -1482,6 +1485,9 @@ nav {
                     line-height: 1.15;
                     color: #211E1E;
                     margin-bottom: 60px;
+                }
+                p {
+                    font-size: .9rem;
                 }
             }
 
@@ -1530,6 +1536,9 @@ nav {
                     line-height: 1.15;
                     color: #211E1E;
                     margin-bottom: 60px;
+                }
+                p {
+                    font-size: .9rem;
                 }
 
                 .divBtn {
@@ -1612,6 +1621,9 @@ nav {
                     line-height: 1.15;
                     color: #211E1E;
                     margin-bottom: 20px;
+                }
+                p {
+                    font-size: .9rem;
                 }
             }
 
@@ -1699,9 +1711,9 @@ nav {
                     }
 
                     p {
-                        font-size: 16px;
+                        font-size: .9rem;
                         font-weight: 550;
-                        line-height: 1.7;
+                        line-height: 2;
                         letter-spacing: 0;
                         margin-bottom: 40px;
                     }
@@ -1777,7 +1789,8 @@ nav {
                 text-align: justify;
 
                 p {
-                    font-size: 16px;
+                    font-size: .9rem;
+                    line-height: 2;
                 }
             }
         }
@@ -1800,6 +1813,7 @@ nav {
                 align-items: center;
 
                 h2 {
+                    margin-top: 60px;
                     font-size: 36px;
                 }
 
@@ -1834,7 +1848,8 @@ nav {
 
         p {
             color: #d0d1d5;
-            font-size: 16px;
+            font-size: .9rem;
+            line-height: 2;
         }
 
         #rodapeConteudo {
@@ -1859,12 +1874,22 @@ nav {
 
                 .rodape-coluna--links {
                     order: 2;
+
+                    li {
+                        a {
+                            font-size: 1.2rem;
+                        }
+                    }
                 }
             }
 
             #rodapePoliticas {
                 margin-top: 40px;
                 justify-content: center;
+
+                a {
+                    font-size: .8rem;
+                }
             }
 
             #rodapeCreditos {
