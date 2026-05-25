@@ -540,7 +540,7 @@ nav {
 /* Estilos para a seção SERVIÇOS */
 #servicos {
     background-color: #D8D1C9;
-    overflow: hidden;
+    overflow: visible;
 
     #conteudoServicos {
         width: 100%;
@@ -553,7 +553,7 @@ nav {
             margin-top: 5rem;
             position: relative;
             height: 900px;
-            overflow: hidden;
+            overflow: visible;
             padding: 2rem;
 
             .polaroid {
@@ -1047,7 +1047,7 @@ nav {
     }
 
     &[open] summary::after {
-        content: "^";
+        content: "-";
     }
 
     /* paragraphs use the global body p styles */
@@ -1486,6 +1486,7 @@ nav {
                     color: #211E1E;
                     margin-bottom: 60px;
                 }
+
                 p {
                     font-size: .9rem;
                 }
@@ -1537,66 +1538,29 @@ nav {
                     color: #211E1E;
                     margin-bottom: 60px;
                 }
+
                 p {
                     font-size: .9rem;
                 }
 
                 .divBtn {
                     margin-top: 40px;
+                    margin-bottom: 60px;
                     display: flex;
                     justify-content: center;
                 }
             }
 
             #servicosGrid {
-                width: 100%;
-                margin-top: 40px;
-                position: relative;
-                height: auto;
-                padding: 0;
+                display: none;
+            }
 
-                .polaroid {
-                    position: relative;
-                    width: 240px;
-                    margin: 0 auto 40px;
-
-                    img {
-                        width: 100%;
-                        height: auto;
-                    }
-                }
-
-                .polaroid {
-                    &:nth-child(1) {
-                        top: 0;
-                        left: 0;
-                    }
-
-                    &:nth-child(2) {
-                        top: 0;
-                        left: 0;
-                    }
-
-                    &:nth-child(3) {
-                        top: 0;
-                        left: 0;
-                    }
-
-                    &:nth-child(4) {
-                        top: 0;
-                        left: 0;
-                    }
-
-                    &:nth-child(5) {
-                        top: 0;
-                        left: 0;
-                    }
-
-                    &:nth-child(6) {
-                        top: 0;
-                        left: 0;
-                    }
-                }
+            #textoServicos p {
+                font-size: 1rem;
+                line-height: 1.7;
+                text-align: left;
+                margin-bottom: 1.25rem;
+                letter-spacing: .02em;
             }
         }
     }
@@ -1622,6 +1586,7 @@ nav {
                     color: #211E1E;
                     margin-bottom: 20px;
                 }
+
                 p {
                     font-size: .9rem;
                 }
