@@ -1601,7 +1601,12 @@ nav {
                 margin-top: 40px;
                 order: -2;
 
-                #sobreTitulo {
+                .sobre-eyebrow {
+                    text-align: left;
+                }
+
+                h2 {
+                    text-align: left;
                     font-size: 40px;
                     line-height: 1.15;
                     color: #211E1E;
@@ -2885,6 +2890,102 @@ nav {
 
             #rodapeCreditos {
                 padding-top: 0.75rem;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1440px) and (max-width: 1770px) {
+    #logo {
+        width: 8.5rem;
+    }
+
+    #valores {
+        #conteudoValores {
+            #imgsValores {
+                #img2valor {
+                    margin-left: 15rem;
+                }
+
+                #img1valor img,
+                #img2valor img {
+                    width: 440px;
+                }
+            }
+        }
+    }
+
+    #servicos {
+        #conteudoServicos {
+            #servicosGrid {
+                width: 50%;
+
+                .polaroid {
+                    width: 100%;
+                    max-width: 200px;
+                }
+
+                .polaroid:nth-child(1) {
+                    left: 70px;
+                }
+
+                .polaroid:nth-child(2) {
+                    left: 265px;
+                }
+
+                .polaroid:nth-child(3) {
+                    left: 455px;
+                }
+
+                .polaroid:nth-child(4) {
+                    left: 45px;
+                }
+
+                .polaroid:nth-child(5) {
+                    left: 240px;
+                }
+
+                .polaroid:nth-child(6) {
+                    left: 425px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1540px) and (max-width: 1770px) {
+    #servicos {
+        #conteudoServicos {
+            #servicosGrid {
+                width: 50%;
+
+                .polaroid {
+                    max-width: 215px;
+                }
+
+                .polaroid:nth-child(1) {
+                    left: 80px;
+                }
+
+                .polaroid:nth-child(2) {
+                    left: 300px;
+                }
+
+                .polaroid:nth-child(3) {
+                    left: 520px;
+                }
+
+                .polaroid:nth-child(4) {
+                    left: 40px;
+                }
+
+                .polaroid:nth-child(5) {
+                    left: 265px;
+                }
+
+                .polaroid:nth-child(6) {
+                    left: 485px;
+                }
             }
         }
     }
