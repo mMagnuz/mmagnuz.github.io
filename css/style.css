@@ -431,7 +431,7 @@ nav {
             flex-direction: column;
             justify-content: center;
             gap: 1.75rem;
-            padding: clamp(3rem, 5vw, 6rem) clamp(2rem, 4vw, 5rem);
+            padding: 40px;
 
             .sobre-eyebrow {
                 font-size: clamp(2.2rem, 3.5vw, 4rem);
@@ -474,15 +474,11 @@ nav {
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
 
             img {
                 width: 80%;
-                height: 80%;
+                height: auto;
                 object-fit: cover;
-                border-radius: 0;
-                box-shadow: none;
-                animation: none;
             }
         }
     }
@@ -1118,14 +1114,6 @@ nav {
                 margin-bottom: 1rem;
                 font-family: "Archivo Black", sans-serif;
             }
-
-            p {
-                font-size: clamp(1.05rem, 1.35vw, 1.6rem);
-                line-height: 1.65;
-                color: #2b282b;
-                max-width: 38ch;
-                margin-bottom: 2rem;
-            }
         }
 
         #ctaFinalImagem {
@@ -1340,6 +1328,7 @@ nav {
     cursor: pointer;
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .contact-fab__trigger:hover {
@@ -1390,6 +1379,7 @@ nav {
     gap: 0.48rem;
     backdrop-filter: blur(8px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    -webkit-tap-highlight-color: transparent;
 }
 
 .contact-fab__link svg,
@@ -1613,8 +1603,9 @@ nav {
                     margin-bottom: 20px;
                 }
 
-                p {
-                    font-size: .9rem;
+                .sobre-descricao {
+                    font-size: 1rem;
+                    text-align: justify;
                 }
             }
 
@@ -1653,7 +1644,7 @@ nav {
                 }
 
                 p {
-                    font-size: .9rem;
+                    font-size: 1rem;
                 }
             }
 
@@ -1753,7 +1744,7 @@ nav {
                 }
 
                 p {
-                    font-size: .9rem;
+                    font-size: 1rem;
                 }
             }
 
@@ -2478,13 +2469,13 @@ nav {
             flex-direction: column;
             align-items: center;
             text-align: center;
+            gap: 0;
 
             #ctaFinalTexto {
                 width: 90%;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 20px;
 
                 h2 {
                     font-size: 50px;
