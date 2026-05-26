@@ -409,52 +409,80 @@ nav {
 /* Estilos para a seção QUEM SOMOS */
 #sobre {
     background-color: #D8D1C9;
-    min-height: 1050px;
+    min-height: 920px;
     position: relative;
     z-index: 1;
+    padding: 0;
+    overflow: hidden;
 
     #conteudoQuemSomos {
+        width: 100%;
+        margin: 0 auto;
         display: flex;
-        justify-content: center;
-        gap: 100px;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 0;
+        min-height: 920px;
+        padding: 0;
 
         #textoQuemSomos {
-            padding: 20px;
-            margin-top: 8rem;
-            width: 30%;
+            width: 60%;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            gap: 1.75rem;
+            padding: clamp(3rem, 5vw, 6rem) clamp(2rem, 4vw, 5rem);
 
-            h2 {
-                font-size: clamp(2.6rem, 4vw, 4.8rem);
-                font-weight: 100;
-                color: #211E1E;
-                line-height: 1.02;
-                margin-bottom: 4rem;
+            .sobre-eyebrow {
+                font-size: clamp(2.2rem, 3.5vw, 4rem);
+                line-height: 1;
+                font-weight: 300;
+                color: #2f2a2a;
+                letter-spacing: 0.01em;
             }
 
-            p {
-                font-size: 1.2rem;
-                line-height: 2.0;
+            .sobre-chamada {
+                font-size: clamp(2.6rem, 5.1vw, 6.8rem);
+                font-weight: 400;
+                color: #1f1b1b;
+                line-height: 1.18;
+                letter-spacing: -0.02em;
+
+                strong {
+                    font-weight: 800;
+                }
+            }
+
+            .sobre-descricao {
+                margin-top: 0.5rem;
+                max-width: 60ch;
+                font-size: clamp(1.05rem, 1.3vw, 1.95rem);
+                line-height: 1.55;
                 color: #252121;
                 font-weight: 400;
-                letter-spacing: .04rem;
+                letter-spacing: 0.01em;
                 text-align: justify;
+
+                strong {
+                    font-weight: 800;
+                }
             }
         }
 
         #imgQuemSomos {
-            margin-top: 6rem;
             width: 40%;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
 
             img {
-                width: 70%;
-                height: auto;
-                animation: floatImage 6s ease-in-out infinite;
-                animation-delay: 1.5s;
+                width: 80%;
+                height: 80%;
+                object-fit: cover;
+                border-radius: 0;
+                box-shadow: none;
+                animation: none;
             }
         }
     }
@@ -2110,6 +2138,11 @@ nav {
         overflow: hidden;
     }
 
+    .contact-fab {
+        margin-right: 22px;
+        margin-bottom: 22px;
+    }
+
     #hero {
         #conteudoHero {
             flex-direction: column;
@@ -2172,6 +2205,13 @@ nav {
                 p {
                     font-size: 20px;
                     font-weight: 450;
+                }
+
+                .sobre-descricao {
+                    font-size: 22px;
+                    line-height: 1.7;
+                    text-align: justify;
+                    letter-spacing: .02em;
                 }
             }
 
@@ -2569,37 +2609,43 @@ nav {
     #sobre {
         #conteudoQuemSomos {
             display: flex;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            gap: 80px;
+            align-items: stretch;
+            text-align: left;
+            padding: 0;
+            gap: 0;
+            min-height: 920px;
 
             #textoQuemSomos {
                 width: 50%;
-                margin-top: 40px;
+                margin-top: 0;
+                padding: clamp(2.6rem, 4vw, 4rem) clamp(1.8rem, 3vw, 3rem);
 
-                h2 {
-                    font-size: 45px;
-                    line-height: 1.15;
-                    color: #211E1E;
-                    margin-bottom: 40px;
+                .sobre-eyebrow {
+                    font-size: 40px;
                 }
 
-                p {
+                .sobre-chamada {
+                    font-size: 60px;
+                    margin-bottom: 0;
+                }
+
+                .sobre-descricao {
                     font-size: 18px;
-                    font-weight: 450;
+                    line-height: 1.6;
+                    max-width: 38ch;
                 }
             }
 
             #imgQuemSomos {
-                width: 40%;
+                width: 50%;
                 margin-top: 0;
+                overflow: hidden;
 
                 img {
                     width: 100%;
-                    height: auto;
-                    animation: floatImage 6s ease-in-out infinite;
-                    animation-delay: 1.5s;
+                    height: 100%;
+                    object-fit: cover;
+                    animation: none;
                 }
             }
         }
