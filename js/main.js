@@ -309,6 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initNavbarScroll();
     initNavSectionHighlight();
     initMobileMenu();
+    initFloatingContactFab();
     initAnchors();
     initPalavras();
     initPortfolio();
@@ -1143,6 +1144,42 @@ function closeMobileMenu() {
     }
     document.body.classList.remove("menu-open");
     nav?.classList.remove("hide");
+}
+
+function initFloatingContactFab() {
+    const fab = document.querySelector("[data-contact-fab]");
+    const trigger = document.querySelector("[data-contact-fab-trigger]");
+    const menu = document.querySelector("[data-contact-fab-menu]");
+    const links = Array.from(document.querySelectorAll(".contact-fab__link"));
+
+    if (!fab || !trigger || !menu || !links.length) return;
+
+    const setOpenState = (isOpen) => {
+        fab.classList.toggle("is-open", isOpen);
+        trigger.setAttribute("aria-expanded", String(isOpen));
+        menu.setAttribute("aria-hidden", String(!isOpen));
+    };
+
+    const toggleFab = () => {
+        const isOpen = fab.classList.contains("is-open");
+        setOpenState(!isOpen);
+    };
+
+    trigger.addEventListener("click", toggleFab);
+
+    document.addEventListener("click", (event) => {
+        if (fab.contains(event.target)) return;
+        setOpenState(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        setOpenState(false);
+    });
+
+    links.forEach((link) => {
+        link.addEventListener("click", () => setOpenState(false));
+    });
 }
 
 // ============== TRACKING ================

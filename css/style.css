@@ -1017,8 +1017,8 @@ nav {
         list-style: none;
         cursor: pointer;
         padding: 1rem 0;
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: 1.2rem;
+        font-weight: 800;
         line-height: 1.45;
         color: #1d1815;
         display: flex;
@@ -1049,14 +1049,18 @@ nav {
     &[open] summary::after {
         content: "-";
     }
-
-    /* paragraphs use the global body p styles */
 }
 
 .faq-answer {
-    height: 0;
+    height: auto;
     overflow: hidden;
     transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+
+    p {
+        font-weight: 600;
+        line-height: 2.0;
+        font-size: 1.05rem;
+    }
 }
 
 /* Estilos para a seção CTA final */
@@ -1284,7 +1288,134 @@ nav {
     margin-top: 0.65rem;
 }
 
+.contact-fab {
+    position: fixed;
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 1100;
+}
+
+.contact-fab__trigger {
+    width: clamp(60px, 10vw, 70px);
+    height: clamp(60px, 10vw, 70px);
+    border: 0;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #181818 0%, #3e3e3e 100%);
+    color: #f5f5f5;
+    cursor: pointer;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-fab__trigger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+
+.contact-fab__trigger svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    stroke: currentColor;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+}
+
+.contact-fab.is-open .contact-fab__trigger {
+    transform: rotate(45deg);
+}
+
+.contact-fab__menu {
+    display: grid;
+    gap: 0.55rem;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+    transform-origin: bottom right;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.contact-fab.is-open .contact-fab__menu {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.contact-fab__link {
+    width: clamp(52px, 8.2vw, 58px);
+    height: clamp(52px, 8.2vw, 58px);
+    padding: 0;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    background-color: rgba(29, 29, 29, 0.92);
+    color: #f7f7f7;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.48rem;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+}
+
+.contact-fab__link svg,
+.contact-fab__link img {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: block;
+    flex: 0 0 auto;
+}
+
+.contact-fab__link svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.contact-fab__link--whatsapp img {
+    filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.contact-fab__link--instagram:hover,
+.contact-fab__link--instagram:focus-visible {
+    background-color: #6e2889;
+}
+
+.contact-fab__link--whatsapp:hover,
+.contact-fab__link--whatsapp:focus-visible {
+    background-color: #148a41;
+}
+
+.contact-fab__link:focus-visible,
+.contact-fab__trigger:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
 @media screen and (min-width: 320px) and (max-width: 767px) {
+    .contact-fab {
+        right: max(12px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .contact-fab__link {
+        width: 52px;
+        height: 52px;
+    }
+
+    body.menu-open .contact-fab {
+        opacity: 0;
+        pointer-events: none;
+    }
+
     #menu-toggle {
         display: block;
         position: absolute;
@@ -1479,6 +1610,7 @@ nav {
             #textoValores {
                 width: 100%;
                 margin-top: 40px;
+                margin-bottom: 40px;
 
                 h2 {
                     font-size: 40px;
@@ -1865,6 +1997,11 @@ nav {
 }
 
 @media screen and (min-width: 768px) and (max-width: 1019px) {
+    body.menu-open .contact-fab {
+        opacity: 0;
+        pointer-events: none;
+    }
+
     #logo {
         width: 10rem;
     }
@@ -2271,7 +2408,7 @@ nav {
             }
 
             .faq-item summary {
-                font-size: 20px;
+                font-size: 1.4rem;
                 padding: 40px;
                 line-height: 1.55;
             }
@@ -2280,7 +2417,8 @@ nav {
                 padding: 40px;
 
                 p {
-                    font-size: 22px;
+                    font-size: 1.3rem;
+                    line-height: 2.0;
                     text-align: justify;
                 }
             }
@@ -2320,6 +2458,11 @@ nav {
 
                 #ctaFinalImgBox {
                     width: 460px;
+                }
+
+                &::before {
+                    width: 420px;
+                    height: 420px;
                 }
             }
         }
