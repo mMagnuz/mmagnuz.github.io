@@ -456,7 +456,7 @@ nav {
             .sobre-descricao {
                 margin-top: 0.5rem;
                 max-width: 60ch;
-                font-size: clamp(1.05rem, 1.3vw, 1.95rem);
+                font-size: 1.2rem;
                 line-height: 1.55;
                 color: #252121;
                 font-weight: 400;
@@ -2976,6 +2976,691 @@ nav {
 
                 .polaroid:nth-child(6) {
                     left: 485px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 1920px) and (min-height: 1080px) {
+    html {
+        font-size: 112.5%;
+    }
+
+    #logo {
+        width: 11rem;
+    }
+
+    nav {
+        padding: 20px 56px;
+
+        ul {
+            gap: 58px;
+
+            li {
+
+                a,
+                button {
+                    font-size: 1.08rem;
+                }
+            }
+        }
+    }
+
+    #hero {
+        #conteudoHero {
+            max-width: 1680px;
+            margin-left: auto;
+            margin-right: auto;
+
+            #esquerdaHero {
+                h1 {
+                    font-size: clamp(4.6rem, 3.2vw, 6.8rem);
+                }
+
+                h2 {
+                    font-size: clamp(2rem, 1.35vw, 2.55rem);
+                    max-width: 30ch;
+                }
+            }
+        }
+    }
+
+    #sobre {
+        #conteudoQuemSomos {
+            #textoQuemSomos {
+                .sobre-eyebrow {
+                    font-size: clamp(2.8rem, 2.1vw, 4.4rem);
+                }
+
+                .sobre-chamada {
+                    font-size: clamp(3.8rem, 3.8vw, 7.2rem);
+                }
+
+                .sobre-descricao {
+                    font-size: 1.2rem;
+                    max-width: 46ch;
+                }
+            }
+        }
+    }
+
+    #valores {
+        #conteudoValores {
+            #textoValores {
+                h2 {
+                    font-size: clamp(3rem, 2.8vw, 5.6rem);
+                }
+
+                p {
+                    font-size: 1.12rem;
+                }
+            }
+
+            #imgsValores {
+
+                #img1valor img,
+                #img2valor img {
+                    width: 520px;
+                }
+            }
+        }
+    }
+
+    #servicos {
+        #conteudoServicos {
+            gap: 4.5rem;
+
+            #servicosGrid {
+                width: 54%;
+                height: 980px;
+                min-height: 980px;
+
+                .polaroid {
+                    max-width: 280px;
+                    padding: 18px 18px 38px;
+
+                    p {
+                        font-size: 1rem;
+                    }
+                }
+
+                .polaroid:nth-child(1) {
+                    left: 92px;
+                }
+
+                .polaroid:nth-child(2) {
+                    left: 340px;
+                }
+
+                .polaroid:nth-child(3) {
+                    left: 585px;
+                }
+
+                .polaroid:nth-child(4) {
+                    left: 58px;
+                }
+
+                .polaroid:nth-child(5) {
+                    left: 306px;
+                }
+
+                .polaroid:nth-child(6) {
+                    left: 552px;
+                }
+            }
+
+            #textoServicos {
+                width: 36%;
+
+                h2 {
+                    font-size: clamp(3rem, 2.8vw, 5.6rem);
+                }
+
+                p {
+                    font-size: 1.12rem;
+                }
+            }
+        }
+    }
+
+    #portfolio {
+        #conteudoPortfolio {
+            width: min(100%, 1480px);
+
+            #textoPortfolio {
+                h2 {
+                    font-size: clamp(3rem, 2.8vw, 5.6rem);
+                }
+
+                p {
+                    font-size: 1.08rem;
+                }
+            }
+        }
+    }
+
+    #depoimentos {
+        #boxDepoimentos {
+            #depoimentosTopo {
+                h2 {
+                    font-size: clamp(2.8rem, 2.6vw, 5rem);
+                }
+            }
+
+            #depoimentosCarrossel {
+                .depoimento {
+                    p {
+                        font-size: 1.08rem;
+                    }
+                }
+            }
+        }
+    }
+
+    #faq {
+        #boxFaq {
+            #faqTopo {
+                h2 {
+                    font-size: clamp(2.8rem, 2.6vw, 5rem);
+                }
+            }
+
+            .faq-item summary {
+                font-size: 1.12rem;
+            }
+
+            .faq-answer {
+                p {
+                    font-size: 1rem;
+                }
+            }
+        }
+    }
+
+    #ctaFinal {
+        #conteudoCtaFinal {
+            #ctaFinalTexto {
+                h2 {
+                    font-size: clamp(3rem, 3vw, 5.2rem);
+                }
+            }
+        }
+    }
+
+    #rodape {
+        #rodapeConteudo {
+            #rodapeTopo {
+                .rodape-coluna {
+
+                    a,
+                    p,
+                    li,
+                    .rodape-endereco {
+                        font-size: 1.08rem;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 2560px) {
+    html {
+        font-size: 118.75%;
+    }
+
+    #logo {
+        width: 12.5rem;
+    }
+
+    nav {
+        padding: 22px 72px;
+
+        ul {
+            gap: 72px;
+
+            li {
+
+                a,
+                button {
+                    font-size: 1.15rem;
+                }
+            }
+        }
+    }
+
+    #hero {
+        #conteudoHero {
+            max-width: 1980px;
+
+            #esquerdaHero {
+                h1 {
+                    font-size: clamp(5.6rem, 3vw, 8rem);
+                }
+
+                h2 {
+                    font-size: clamp(2.25rem, 1.1vw, 2.85rem);
+                    max-width: 28ch;
+                }
+            }
+        }
+    }
+
+    #sobre {
+        #conteudoQuemSomos {
+            #textoQuemSomos {
+                .sobre-eyebrow {
+                    font-size: clamp(3.1rem, 1.9vw, 4.9rem);
+                }
+
+                .sobre-chamada {
+                    font-size: clamp(4.4rem, 3.4vw, 8rem);
+                }
+
+                .sobre-descricao {
+                    font-size: 1.3rem;
+                    max-width: 44ch;
+                }
+            }
+        }
+    }
+
+    #valores {
+        #conteudoValores {
+            #textoValores {
+                h2 {
+                    font-size: clamp(3.4rem, 2.5vw, 6rem);
+                }
+
+                p {
+                    font-size: 1.2rem;
+                }
+            }
+
+            #imgsValores {
+
+                #img1valor img,
+                #img2valor img {
+                    width: 600px;
+                }
+            }
+        }
+    }
+
+    #servicos {
+        #conteudoServicos {
+            #servicosGrid {
+                height: 1120px;
+                min-height: 1120px;
+
+                .polaroid {
+                    max-width: 320px;
+                    padding: 20px 20px 42px;
+
+                    p {
+                        font-size: 1.05rem;
+                    }
+                }
+
+                .polaroid:nth-child(1) {
+                    left: 110px;
+                }
+
+                .polaroid:nth-child(2) {
+                    left: 400px;
+                }
+
+                .polaroid:nth-child(3) {
+                    left: 690px;
+                }
+
+                .polaroid:nth-child(4) {
+                    left: 82px;
+                }
+
+                .polaroid:nth-child(5) {
+                    left: 374px;
+                }
+
+                .polaroid:nth-child(6) {
+                    left: 666px;
+                }
+            }
+
+            #textoServicos {
+                h2 {
+                    font-size: clamp(3.4rem, 2.5vw, 6rem);
+                }
+
+                p {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+
+    #portfolio {
+        #conteudoPortfolio {
+            width: min(100%, 1640px);
+
+            #textoPortfolio {
+                h2 {
+                    font-size: clamp(3.4rem, 2.5vw, 6rem);
+                }
+
+                p {
+                    font-size: 1.15rem;
+                }
+            }
+        }
+    }
+
+    #depoimentos {
+        #boxDepoimentos {
+            width: min(92%, 1260px);
+
+            #depoimentosTopo {
+                h2 {
+                    font-size: clamp(3.2rem, 2.2vw, 5.6rem);
+                }
+            }
+
+            #depoimentosCarrossel {
+                .depoimento {
+                    p {
+                        font-size: 1.15rem;
+                    }
+                }
+            }
+        }
+    }
+
+    #faq {
+        #boxFaq {
+            width: min(92%, 1260px);
+
+            #faqTopo {
+                h2 {
+                    font-size: clamp(3.2rem, 2.2vw, 5.6rem);
+                }
+            }
+
+            .faq-item summary {
+                font-size: 1.18rem;
+            }
+
+            .faq-answer {
+                p {
+                    font-size: 1.08rem;
+                }
+            }
+        }
+    }
+
+    #ctaFinal {
+        #conteudoCtaFinal {
+            #ctaFinalTexto {
+                h2 {
+                    font-size: clamp(3.4rem, 2.6vw, 6rem);
+                }
+            }
+        }
+    }
+
+    #rodape {
+        #rodapeConteudo {
+            width: min(100%, 1640px);
+
+            #rodapeTopo {
+                .rodape-coluna {
+
+                    a,
+                    p,
+                    li,
+                    .rodape-endereco {
+                        font-size: 1.15rem;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 3840px) {
+    html {
+        font-size: 128.125%;
+    }
+
+    #logo {
+        width: 14.5rem;
+    }
+
+    nav {
+        padding: 30px 112px;
+
+        ul {
+            gap: 96px;
+
+            li {
+
+                a,
+                button {
+                    font-size: 1.3rem;
+                }
+            }
+        }
+    }
+
+    #hero {
+        #conteudoHero {
+            max-width: 2160px;
+            padding-inline: 3rem;
+
+            #esquerdaHero {
+                h1 {
+                    font-size: clamp(6.6rem, 2.55vw, 9.6rem);
+                }
+
+                h2 {
+                    font-size: clamp(2.55rem, 0.95vw, 3.15rem);
+                    max-width: 26ch;
+                }
+            }
+        }
+    }
+
+    #sobre {
+        #conteudoQuemSomos {
+            #textoQuemSomos {
+                .sobre-eyebrow {
+                    font-size: clamp(3.6rem, 1.5vw, 5.8rem);
+                }
+
+                .sobre-chamada {
+                    font-size: clamp(5rem, 2.85vw, 9.2rem);
+                }
+
+                .sobre-descricao {
+                    font-size: 1.4rem;
+                    max-width: 40ch;
+                }
+            }
+        }
+    }
+
+    #valores {
+        #conteudoValores {
+            #textoValores {
+                h2 {
+                    font-size: clamp(3.8rem, 2vw, 6.8rem);
+                }
+
+                p {
+                    font-size: 1.28rem;
+                }
+            }
+
+            #imgsValores {
+
+                #img1valor img,
+                #img2valor img {
+                    width: 680px;
+                }
+            }
+        }
+    }
+
+    #servicos {
+        #conteudoServicos {
+            gap: 7rem;
+
+            #servicosGrid {
+                width: 52%;
+                height: 1280px;
+                min-height: 1280px;
+
+                .polaroid {
+                    max-width: 360px;
+                    padding: 22px 22px 44px;
+
+                    p {
+                        font-size: 1.15rem;
+                    }
+                }
+
+                .polaroid:nth-child(1) {
+                    left: 120px;
+                }
+
+                .polaroid:nth-child(2) {
+                    left: 445px;
+                }
+
+                .polaroid:nth-child(3) {
+                    left: 770px;
+                }
+
+                .polaroid:nth-child(4) {
+                    left: 80px;
+                }
+
+                .polaroid:nth-child(5) {
+                    left: 405px;
+                }
+
+                .polaroid:nth-child(6) {
+                    left: 735px;
+                }
+            }
+
+            #textoServicos {
+                width: 38%;
+
+                h2 {
+                    font-size: clamp(3.8rem, 2vw, 6.8rem);
+                }
+
+                p {
+                    font-size: 1.28rem;
+                }
+            }
+        }
+    }
+
+    #portfolio {
+        #conteudoPortfolio {
+            width: min(100%, 1720px);
+            gap: 3.5rem;
+
+            #textoPortfolio {
+                h2 {
+                    font-size: clamp(3.8rem, 2vw, 6.8rem);
+                }
+
+                p {
+                    font-size: 1.18rem;
+                }
+            }
+        }
+    }
+
+    #depoimentos {
+        #boxDepoimentos {
+            width: min(90%, 1560px);
+
+            #depoimentosTopo {
+                h2 {
+                    font-size: clamp(3.6rem, 1.85vw, 6.1rem);
+                }
+            }
+
+            #depoimentosCarrossel {
+                .depoimento {
+                    p {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+        }
+    }
+
+    #faq {
+        #boxFaq {
+            width: min(90%, 1560px);
+
+            #faqTopo {
+                h2 {
+                    font-size: clamp(3.6rem, 1.85vw, 6.1rem);
+                }
+            }
+
+            .faq-item summary {
+                font-size: 1.22rem;
+            }
+
+            .faq-answer {
+                p {
+                    font-size: 1.12rem;
+                }
+            }
+        }
+    }
+
+    #ctaFinal {
+        #conteudoCtaFinal {
+            gap: 4rem;
+
+            #ctaFinalTexto {
+                width: 66%;
+
+                h2 {
+                    font-size: clamp(3.8rem, 2.05vw, 7rem);
+                }
+            }
+
+            #ctaFinalImagem {
+                width: 34%;
+            }
+        }
+    }
+
+    #rodape {
+        #rodapeConteudo {
+            width: min(100%, 1720px);
+            padding-inline: 1rem;
+
+            #rodapeTopo {
+                gap: 3.4rem;
+
+                .rodape-coluna {
+
+                    a,
+                    p,
+                    li,
+                    .rodape-endereco {
+                        font-size: 1.18rem;
+                    }
                 }
             }
         }
