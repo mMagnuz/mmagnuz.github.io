@@ -1,14 +1,11 @@
 // GSAP
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 const MOBILE_BREAKPOINT = 319;
 const TABLET_BREAKPOINT = 1019;
 
 // Enable ScrollTrigger markers for debugging (toggle off after inspection)
 const DEBUG_SCROLL_MARKERS = false;
-
-let smoother = null;
-let _smootherSyncRaf = null;
 
 // Global handlers to avoid uncaught promise/errors stopping initialization
 window.addEventListener('unhandledrejection', (ev) => {
@@ -48,63 +45,6 @@ function scrollTriggerOpts(overrides = {}) {
     };
     if (DEBUG_SCROLL_MARKERS) defaults.markers = true;
     return Object.assign({}, defaults, overrides);
-}
-
-// ScrollSmoother helpers: create/destroy and toggle based on viewport/profile
-function createSmoother() {
-    if (typeof ScrollSmoother === 'undefined') return;
-    if (smoother) return;
-
-    const motion = getMotionProfile();
-    try {
-        smoother = ScrollSmoother.create({
-            smooth: Math.max(0.6, 0.9 * motion.durationScale),
-            effects: true,
-            normalizeScroll: true,
-            smoothTouch: 0.12
-        });
-    } catch (e) {
-        smoother = null;
-    }
-    try { ScrollTrigger.refresh(); } catch (e) { }
-    // start a RAF loop to keep ScrollTrigger in sync with smoother
-    startSmootherSyncLoop();
-}
-
-function destroySmoother() {
-    if (!smoother) return;
-    try {
-        smoother.kill();
-    } catch (e) { }
-    smoother = null;
-    try { ScrollTrigger.refresh(); } catch (e) { }
-    stopSmootherSyncLoop();
-}
-
-function startSmootherSyncLoop() {
-    if (_smootherSyncRaf || typeof ScrollTrigger === 'undefined') return;
-    const loop = () => {
-        try { ScrollTrigger.update(); } catch (e) { }
-        _smootherSyncRaf = requestAnimationFrame(loop);
-    };
-    _smootherSyncRaf = requestAnimationFrame(loop);
-}
-
-function stopSmootherSyncLoop() {
-    if (!_smootherSyncRaf) return;
-    cancelAnimationFrame(_smootherSyncRaf);
-    _smootherSyncRaf = null;
-}
-
-function toggleSmoother() {
-    const motion = getMotionProfile();
-    // don't enable on reduced-motion or low-performance devices
-    if (motion.reduce || motion.lowPerformance || isMobileViewport()) {
-        destroySmoother();
-        return;
-    }
-
-    createSmoother();
 }
 
 function isPhoneViewport() {
@@ -147,7 +87,6 @@ function initGlobalAnimationOptimization() {
 
         if (!isHidden && wasHidden) {
             window.requestAnimationFrame(() => {
-                smoother?.refresh?.();
                 ScrollTrigger.update();
                 ScrollTrigger.refresh();
             });
@@ -167,14 +106,8 @@ function restoreHashScrollImmediate() {
     const target = document.querySelector(hash);
     if (!target) return;
 
-    // Usar requestAnimationFrame para adiar a restauração do scroll
-    // Isso garante que o ScrollSmoother esteja totalmente inicializado
     window.requestAnimationFrame(() => {
-        if (smoother?.scrollTo) {
-            smoother.scrollTo(target, false, "top top");
-        } else {
-            target.scrollIntoView({ behavior: "auto", block: "start" });
-        }
+        target.scrollIntoView({ behavior: "auto", block: "start" });
 
         ScrollTrigger.update();
         ScrollTrigger.refresh();
@@ -316,9 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initDepoimentos();
     initFaqAccordion();
 
-    // Garantir smoother configurado antes das animações iniciarem
-    toggleSmoother();
-
     document.fonts.ready.then(() => {
         animarPagina();
         refreshScrollTriggers();
@@ -340,9 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
             playAnimationsOnReload();
         });
     });
-    // Ativa/desativa ScrollSmoother conforme viewport e atualiza triggers em resize
-    toggleSmoother();
-    addResizeAndOrientation(() => { refreshScrollTriggers(); toggleSmoother(); }, 150);
+    addResizeAndOrientation(refreshScrollTriggers, 150);
 
     // Garantir que animações disparem ao recarregar independente da posição
     function playAnimationsOnReload() {
@@ -436,16 +364,7 @@ function initAnchors() {
         };
 
         if (targetId === '#' || targetId === '#top') {
-            if (smoother?.scrollTo) {
-                smoother.scrollTo(0, scrollOptions);
-            } else {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            return;
-        }
-
-        if (smoother?.scrollTo) {
-            smoother.scrollTo(targetId, scrollOptions);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 

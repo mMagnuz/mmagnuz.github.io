@@ -1,37 +1,11 @@
-gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText);
-
-const TABLET_BREAKPOINT = 1019;
-
-let smoother = null;
+gsap.registerPlugin(ScrollTrigger, SplitText);
 
 function isMobileViewport() {
-    return window.innerWidth <= TABLET_BREAKPOINT;
-}
-
-function setupSmoother() {
-    const wrapper = document.querySelector("#smooth-wrapper");
-    const content = document.querySelector("#smooth-content");
-    const shouldDisableSmoother = isMobileViewport() || ScrollTrigger.isTouch === 1;
-
-    if (shouldDisableSmoother) {
-        if (smoother) {
-            smoother.kill();
-            smoother = null;
-        }
-        return;
-    }
-
-    if (!smoother && wrapper && content) {
-        smoother = ScrollSmoother.create({
-            smooth: 1.5,
-            effects: true
-        });
-    }
+    return window.innerWidth <= 1019;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     initPortfolioGalleryLightbox();
-    setupSmoother();
 });
 
 function initPortfolioGalleryLightbox() {
