@@ -1022,12 +1022,14 @@ function animarPagina() {
 
     const quemSomosImageTrigger = isTablet ? "#imgQuemSomos" : "#sobre";
     const quemSomosImageStart = isTablet ? "top 96%" : sectionStart;
+    const quemSomosImageFilter = isMobile ? "none" : "blur(6px)";
 
     gsap.from("#imgQuemSomos", {
         y: Math.round(100 * motion.distanceScale),
         opacity: 0,
         duration: 1 * motion.durationScale,
-        filter: "blur(6px)",
+        filter: quemSomosImageFilter,
+        force3D: true,
         scrollTrigger: scrollTriggerOpts({
             trigger: quemSomosImageTrigger,
             start: quemSomosImageStart,

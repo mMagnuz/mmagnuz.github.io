@@ -39,6 +39,11 @@ body.low-performance-device #img2valor img {
     animation-duration: 8.5s;
 }
 
+body.low-performance-device #img1valor img,
+body.low-performance-device #img2valor img {
+    animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
 
     *,
@@ -470,6 +475,8 @@ nav {
             display: flex;
             align-items: center;
             justify-content: center;
+            will-change: transform, opacity;
+            transform: translateZ(0);
 
             img {
                 width: 80%;
