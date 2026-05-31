@@ -1,12 +1,91 @@
-gsap.registerPlugin(ScrollTrigger, SplitText);
+﻿gsap.registerPlugin(ScrollTrigger, SplitText);
 
 function isMobileViewport() {
     return window.innerWidth <= 1019;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initEnsaiosHeadingAnimation();
+    initEnsaiosIntroParagraphAnimation();
     initPortfolioGalleryLightbox();
 });
+
+function initEnsaiosHeadingAnimation() {
+    const heading = document.querySelector(".ensaios-intro h1");
+    if (!heading) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+        gsap.set(heading, { opacity: 1, y: 0, clearProps: "transform" });
+        return;
+    }
+
+    if (typeof SplitText !== "undefined") {
+        const split = new SplitText(heading, {
+            type: "lines, words, chars",
+            linesClass: "split-line"
+        });
+
+        gsap.set(split.chars, { y: 40, opacity: 0 });
+
+        gsap.timeline({
+            scrollTrigger: {
+                trigger: heading,
+                start: isMobileViewport() ? "top 88%" : "top 92%",
+                toggleActions: "play none none none",
+                once: true,
+                invalidateOnRefresh: true
+            }
+        }).to(split.chars, {
+            y: 0,
+            opacity: 1,
+            duration: 0.30,
+            stagger: 0.02,
+            ease: "power2.out"
+        });
+
+        return;
+    }
+
+    gsap.fromTo(heading, { y: 40, autoAlpha: 0 }, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.35,
+        ease: "power2.out",
+        scrollTrigger: {
+            trigger: heading,
+            start: isMobileViewport() ? "top 88%" : "top 92%",
+            toggleActions: "play none none none",
+            once: true,
+            invalidateOnRefresh: true
+        }
+    });
+}
+
+function initEnsaiosIntroParagraphAnimation() {
+    const paragraph = document.querySelector(".ensaios-intro p:not(.ensaios-kicker)");
+    if (!paragraph) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+        gsap.set(paragraph, { opacity: 1, y: 0, clearProps: "transform" });
+        return;
+    }
+
+    gsap.fromTo(paragraph, { y: 36, autoAlpha: 0 }, {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.75,
+        ease: "power2.out",
+        scrollTrigger: {
+            trigger: paragraph,
+            start: isMobileViewport() ? "top 90%" : "top 94%",
+            toggleActions: "play none none none",
+            once: true,
+            invalidateOnRefresh: true
+        }
+    });
+}
 
 function initPortfolioGalleryLightbox() {
     const gallery = document.querySelector(".portfolio-gallery, .ensaios-gallery");
@@ -21,17 +100,17 @@ function initPortfolioGalleryLightbox() {
         <div class="gallery-viewer__backdrop" data-close></div>
         <div class="gallery-viewer__chrome" role="dialog" aria-modal="true" aria-label="Visualizador de fotos">
             <button type="button" class="gallery-viewer__button gallery-viewer__close" aria-label="Fechar visualizador">
-                <img src="icon/cruz.svg" alt="" aria-hidden="true" />
+                <img src="../icon/cruz.svg" alt="" aria-hidden="true" />
             </button>
             <button type="button" class="gallery-viewer__button gallery-viewer__prev" aria-label="Foto anterior">
-                <img src="icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
+                <img src="../icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
             </button>
             <figure class="gallery-viewer__frame">
                 <img class="gallery-viewer__image" alt="" />
                 <figcaption class="gallery-viewer__counter"></figcaption>
             </figure>
             <button type="button" class="gallery-viewer__button gallery-viewer__next" aria-label="Proxima foto">
-                <img src="icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
+                <img src="../icon/seta-pequena-direita.svg" alt="" aria-hidden="true" />
             </button>
             <div class="gallery-viewer__tools" aria-label="Controles de zoom">
                 <button type="button" class="gallery-viewer__button gallery-viewer__zoom-out" aria-label="Diminuir zoom">-</button>

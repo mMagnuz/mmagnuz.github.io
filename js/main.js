@@ -4,10 +4,8 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 const MOBILE_BREAKPOINT = 319;
 const TABLET_BREAKPOINT = 1019;
 
-// Enable ScrollTrigger markers for debugging (toggle off after inspection)
 const DEBUG_SCROLL_MARKERS = false;
 
-// Global handlers to avoid uncaught promise/errors stopping initialization
 window.addEventListener('unhandledrejection', (ev) => {
     try { console.warn('Unhandled promise rejection:', ev.reason); } catch (e) { }
 });
@@ -19,7 +17,6 @@ function getScrollY() {
     return window.scrollY || window.pageYOffset || 0;
 }
 
-// Small utilities: debounce and combined resize/orientation listener
 function debounce(fn, wait = 150) {
     let t = null;
     return function (...args) {
@@ -38,7 +35,6 @@ function addResizeAndOrientation(handler, wait = 150) {
     };
 }
 
-// ScrollTrigger defaults helper to avoid repeating common options
 function scrollTriggerOpts(overrides = {}) {
     const defaults = {
         invalidateOnRefresh: true
@@ -234,113 +230,8 @@ function initNavSectionHighlight() {
     addResizeAndOrientation(requestUpdate, 150);
 }
 
-// ================= INIT =================
-document.addEventListener("DOMContentLoaded", () => {
-    const refreshScrollTriggers = () => ScrollTrigger.refresh();
-
-    initGlobalAnimationOptimization();
-    initNavbarScroll();
-    initNavSectionHighlight();
-    initMobileMenu();
-    initFloatingContactFab();
-    initAnchors();
-    initPalavras();
-    initPortfolio();
-    initDepoimentos();
-    initFaqAccordion();
-
-    document.fonts.ready.then(() => {
-        animarPagina();
-        refreshScrollTriggers();
-
-        // Restaurar o hash scroll após as animações estarem prontas
-        window.requestAnimationFrame(() => {
-            restoreHashScrollImmediate();
-            refreshScrollTriggers();
-            playAnimationsOnReload();
-        });
-    }).catch(() => { });
-
-    window.addEventListener("load", () => {
-        refreshScrollTriggers();
-
-        // Fazer um refresh adicional após o load para garantir sincronização
-        window.requestAnimationFrame(() => {
-            refreshScrollTriggers();
-            playAnimationsOnReload();
-        });
-    });
-    addResizeAndOrientation(refreshScrollTriggers, 150);
-
-    // Garantir que animações disparem ao recarregar independente da posição
-    function playAnimationsOnReload() {
-        const motion = getMotionProfile();
-        if (motion.reduce) return;
-
-        window.requestAnimationFrame(() => {
-            try { ScrollTrigger.refresh(); ScrollTrigger.update(); } catch (e) { }
-            const triggers = (ScrollTrigger.getAll && ScrollTrigger.getAll()) || [];
-            const isMostlyInViewport = (el, minRatio = 0.15) => {
-                if (!el || !el.getBoundingClientRect) return false;
-                const r = el.getBoundingClientRect();
-                const vh = window.innerHeight || document.documentElement.clientHeight;
-                const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
-                const h = r.height || 1;
-                return (visible / h) >= minRatio;
-            };
-
-            // Determine default visible thresholds depending on device size
-            // Increase strictness on mobile/tablet to avoid premature firing
-            const defaultMin = isMobileViewport() ? 0.55 : 0.12;
-
-            triggers.forEach((st) => {
-                try {
-                    const triggerEl = st.trigger || st.scroller || null;
-                    // for important larger sections (like 'sobre') require more visible area
-                    const specialLargeSection = triggerEl && (triggerEl.id === 'sobre' || triggerEl.id === 'valores');
-                    const minRatio = specialLargeSection
-                        ? (isMobileViewport() ? 0.75 : 0.25)
-                        : defaultMin;
-                    const inView = triggerEl ? isMostlyInViewport(triggerEl, minRatio) : false;
-                    const anim = st.animation;
-
-                    if (anim) {
-                        const vars = st.vars || st._vars || {};
-                        const isScrub = Object.prototype.hasOwnProperty.call(vars, 'scrub');
-
-                        if (isScrub) {
-                            // Scrubbed animations should reflect scroll position
-                            try {
-                                const prog = (typeof st.progress === 'number') ? st.progress : (st.progress && st.progress());
-                                if (typeof anim.progress === 'function') anim.progress(prog || 0);
-                                if (typeof anim.pause === 'function') anim.pause();
-                            } catch (e) { }
-                        } else if (inView) {
-                            try {
-                                if (typeof anim.restart === 'function') anim.restart(true);
-                                if (typeof anim.play === 'function') anim.play();
-                            } catch (e) { }
-                        } else {
-                            try {
-                                if (typeof anim.pause === 'function') anim.pause();
-                                if (typeof anim.seek === 'function') anim.seek(0);
-                                if (typeof anim.progress === 'function') anim.progress(0);
-                            } catch (e) { }
-                        }
-                    } else {
-                        const vars = st.vars || st._vars || {};
-                        if (inView) {
-                            if (typeof vars.onEnter === 'function') vars.onEnter();
-                            if (typeof vars.onEnterBack === 'function') vars.onEnterBack();
-                        }
-                    }
-                } catch (e) { }
-            });
-
-            try { ScrollTrigger.update(); } catch (e) { }
-        });
-    }
-});
+// ================= APP =================
+document.addEventListener("DOMContentLoaded", initApp);
 
 // =============== ANCHORS ================
 function initAnchors() {
@@ -449,7 +340,7 @@ function initPalavras() {
 function initPortfolio() {
     const portfolioSection = document.querySelector("#portfolio");
     const portfolioCards = Array.from(document.querySelectorAll("#portfolio .portfolio"));
-    const portfolioIntro = Array.from(document.querySelectorAll("#textoPortfolio .portfolio-kicker, #textoPortfolio p"));
+    const portfolioIntro = Array.from(document.querySelectorAll("#textoPortfolio .portfolio-kicker"));
 
     if (!portfolioSection || !portfolioCards.length) return;
 
@@ -762,6 +653,8 @@ function initFaqAccordion() {
 // ============== ANIMAÇÕES ===============
 function animarPagina() {
     const textosAnim = document.querySelectorAll(".textoAnimado");
+    const sectionParagraphs = Array.from(document.querySelectorAll("#textoQuemSomos .sobre-descricao, #textoValores p, #textoServicos p, #textoPortfolio p"));
+    const faqItems = Array.from(document.querySelectorAll("#faqLista .faq-item"));
     const motion = getMotionProfile();
     const isMobile = isPhoneViewport();
     const isTablet = isMobileViewport();
@@ -777,6 +670,7 @@ function animarPagina() {
 
     const sectionStart = isMobile ? "top 48%" : isTablet ? "top 55%" : "top 50%";
     const servicesStart = isMobile ? "top 40%" : isTablet ? "top 46%" : "top 50%";
+    const sobreStart = isMobile ? "top 50%" : isTablet ? "top 42%" : "top 62%";
 
     textosAnim.forEach(textoA => {
         let textStart = startValue;
@@ -823,6 +717,289 @@ function animarPagina() {
             });
         }
     });
+
+    const sobrePalavras = Array.from(document.querySelectorAll("#sobre-titulo .sobre-palavra"));
+    if (sobrePalavras.length === 6) {
+        if (motion.reduce) {
+            gsap.set(sobrePalavras, { x: 0, y: 0, autoAlpha: 1, clearProps: "transform" });
+        } else {
+            const [jheniffer, e, matheus, newWord, creation, ponto] = sobrePalavras;
+
+            gsap.set(jheniffer, { x: Math.round(-120 * motion.distanceScale), autoAlpha: 0 });
+            gsap.set(e, { y: Math.round(-80 * motion.distanceScale), autoAlpha: 0 });
+            gsap.set(matheus, { y: Math.round(80 * motion.distanceScale), autoAlpha: 0 });
+            gsap.set(newWord, { x: Math.round(120 * motion.distanceScale), autoAlpha: 0 });
+            gsap.set(creation, { y: Math.round(80 * motion.distanceScale), autoAlpha: 0 });
+            gsap.set(ponto, { x: Math.round(-80 * motion.distanceScale), autoAlpha: 0 });
+
+            gsap.timeline({
+                scrollTrigger: scrollTriggerOpts({
+                    trigger: "#sobre",
+                    start: sobreStart,
+                    toggleActions: "play none none none",
+                    once: true
+                })
+            })
+                .to(jheniffer, {
+                    x: 0,
+                    autoAlpha: 1,
+                    duration: 0.4 * motion.durationScale,
+                    ease: "power2.out"
+                })
+                .to(e, {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: 0.3 * motion.durationScale,
+                    ease: "power2.out"
+                }, "-=0.06")
+                .to(matheus, {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: 0.4 * motion.durationScale,
+                    ease: "power2.out"
+                }, "-=0.06")
+                .to(newWord, {
+                    x: 0,
+                    autoAlpha: 1,
+                    duration: 0.4 * motion.durationScale,
+                    ease: "power2.out"
+                }, "-=0.02")
+                .to(creation, {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: 0.4 * motion.durationScale,
+                    ease: "power2.out"
+                }, "-=0.06")
+                .to(ponto, {
+                    x: 0,
+                    autoAlpha: 1,
+                    duration: 0.25 * motion.durationScale,
+                    ease: "power2.out"
+                }, "-=0.02");
+        }
+    }
+
+    if (motion.reduce) {
+        gsap.set(sectionParagraphs, { y: 0, autoAlpha: 1, clearProps: "transform" });
+        gsap.set(faqItems, { x: 0, autoAlpha: 1, clearProps: "transform" });
+    } else {
+        sectionParagraphs.forEach((paragraph, index) => {
+            gsap.fromTo(paragraph, {
+                y: Math.round(36 * motion.distanceScale),
+                autoAlpha: 0
+            }, {
+                y: 0,
+                autoAlpha: 1,
+                duration: 0.75 * motion.durationScale,
+                ease: "power2.out",
+                delay: Math.min(index, 4) * (0.04 * motion.staggerScale),
+                scrollTrigger: scrollTriggerOpts({
+                    trigger: paragraph,
+                    start: isMobileViewport() ? "top 90%" : "top 94%",
+                    toggleActions: "play none none none",
+                    once: true
+                })
+            });
+        });
+
+        faqItems.forEach((item, index) => {
+            gsap.fromTo(item, {
+                x: -Math.round(52 * motion.distanceScale),
+                autoAlpha: 0
+            }, {
+                x: 0,
+                autoAlpha: 1,
+                duration: 0.7 * motion.durationScale,
+                ease: "power2.out",
+                delay: Math.min(index, 8) * (0.05 * motion.staggerScale),
+                scrollTrigger: scrollTriggerOpts({
+                    trigger: item,
+                    start: isMobileViewport() ? "top 92%" : "top 96%",
+                    toggleActions: "play none none none",
+                    once: true
+                })
+            });
+        });
+    }
+
+    const footer = document.querySelector("#rodape");
+    const footerBrandText = footer ? Array.from(footer.querySelectorAll(".rodape-coluna--marca h2, .rodape-coluna--marca h3, .rodape-coluna--marca p")) : [];
+    const footerLinksTitle = footer?.querySelector(".rodape-coluna--links h4");
+    const footerLinksItems = footer ? Array.from(footer.querySelectorAll(".rodape-coluna--links li")) : [];
+    const footerContactText = footer ? Array.from(footer.querySelectorAll(".rodape-coluna--contatos a > span:not(.rodape-icone)")) : [];
+    const footerPolicies = footer ? Array.from(footer.querySelectorAll("#rodapePoliticas a")) : [];
+    const footerCredits = footer ? Array.from(footer.querySelectorAll("#rodapeCreditos p")) : [];
+
+    if (footer) {
+        if (motion.reduce) {
+            gsap.set(footer, { y: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerBrandText, { y: 0, x: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerLinksTitle, { x: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerLinksItems, { x: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerContactText, { x: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerPolicies, { x: 0, autoAlpha: 1, clearProps: "transform" });
+            gsap.set(footerCredits, { y: 0, autoAlpha: 1, clearProps: "transform" });
+        } else {
+            const footerLift = Math.round(56 * motion.distanceScale);
+
+            gsap.set(footer, {
+                y: footerLift,
+                autoAlpha: 0.94
+            });
+
+            gsap.set(footerBrandText, {
+                y: Math.round(34 * motion.distanceScale),
+                autoAlpha: 0
+            });
+
+            if (footerLinksTitle) {
+                gsap.set(footerLinksTitle, {
+                    x: -Math.round(36 * motion.distanceScale),
+                    autoAlpha: 0
+                });
+            }
+
+            gsap.set(footerLinksItems, {
+                x: -Math.round(28 * motion.distanceScale),
+                autoAlpha: 0
+            });
+
+            gsap.set(footerContactText, {
+                x: -Math.round(30 * motion.distanceScale),
+                autoAlpha: 0
+            });
+
+            gsap.set(footerPolicies, {
+                x: -Math.round(34 * motion.distanceScale),
+                autoAlpha: 0
+            });
+
+            gsap.set(footerCredits, {
+                y: Math.round(26 * motion.distanceScale),
+                autoAlpha: 0
+            });
+
+            const footerStart = isMobile ? "top 98%" : isTablet ? "top 94%" : "top 90%";
+            const footerEnd = isMobile ? "top 66%" : isTablet ? "top 62%" : "top 58%";
+
+            if (isMobile || isTablet) {
+                const footerReveal = gsap.timeline({ paused: true });
+
+                footerReveal.to(footer, {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: 0.9 * motion.durationScale,
+                    ease: "power2.out"
+                }, 0)
+                    .to(footerBrandText, {
+                        y: 0,
+                        autoAlpha: 1,
+                        duration: 0.72 * motion.durationScale,
+                        stagger: 0.11 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.08)
+                    .to(footerLinksTitle, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.62 * motion.durationScale,
+                        ease: "power2.out"
+                    }, 0.18)
+                    .to(footerLinksItems, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.62 * motion.durationScale,
+                        stagger: 0.07 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.28)
+                    .to(footerContactText, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.66 * motion.durationScale,
+                        stagger: 0.08 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.24)
+                    .to(footerPolicies, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.62 * motion.durationScale,
+                        stagger: 0.1 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.5)
+                    .to(footerCredits, {
+                        y: 0,
+                        autoAlpha: 1,
+                        duration: 0.66 * motion.durationScale,
+                        stagger: 0.1 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.58);
+
+                ScrollTrigger.create(scrollTriggerOpts({
+                    trigger: footer,
+                    start: footerStart,
+                    toggleActions: "play none none none",
+                    once: true,
+                    onEnter: () => footerReveal.play(0)
+                }));
+            } else {
+                const footerTl = gsap.timeline({
+                    scrollTrigger: scrollTriggerOpts({
+                        trigger: footer,
+                        start: footerStart,
+                        end: footerEnd,
+                        scrub: motion.scrub
+                    })
+                });
+
+                footerTl.to(footer, {
+                    y: 0,
+                    autoAlpha: 1,
+                    duration: 1.3,
+                    ease: "none"
+                }, 0)
+                    .to(footerBrandText, {
+                        y: 0,
+                        autoAlpha: 1,
+                        duration: 0.86 * motion.durationScale,
+                        stagger: 0.12 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.1)
+                    .to(footerLinksTitle, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.72 * motion.durationScale,
+                        ease: "power2.out"
+                    }, 0.2)
+                    .to(footerLinksItems, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.72 * motion.durationScale,
+                        stagger: 0.08 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.28)
+                    .to(footerContactText, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.78 * motion.durationScale,
+                        stagger: 0.1 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.24)
+                    .to(footerPolicies, {
+                        x: 0,
+                        autoAlpha: 1,
+                        duration: 0.72 * motion.durationScale,
+                        stagger: 0.12 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.56)
+                    .to(footerCredits, {
+                        y: 0,
+                        autoAlpha: 1,
+                        duration: 0.78 * motion.durationScale,
+                        stagger: 0.12 * motion.staggerScale,
+                        ease: "power2.out"
+                    }, 0.64);
+            }
+        }
+    }
 
     gsap.from("#hero", { opacity: 0, duration: 1 * motion.durationScale });
 
@@ -1124,38 +1301,168 @@ function bindTrackingBySelector(selector, configFactory) {
     });
 }
 
-bindTrackingBySelector('.btn', () => ({
-    eventName: 'clique_agendamento',
-    category: 'Botoes',
-    label: 'Botao de agendamento no Hero'
-}));
+function initTracking() {
+    bindTrackingBySelector('.btn', () => ({
+        eventName: 'clique_agendamento',
+        category: 'Botoes',
+        label: 'Botao de agendamento no Hero'
+    }));
 
-bindTrackingBySelector('.btnServicos', (_, index) => ({
-    eventName: 'clique_agendamento',
-    category: 'Botoes',
-    label: index === 0
-        ? 'Botao de agendamento na Secao de Servicos'
-        : 'Botao de agendamento no CTA Final'
-}));
+    bindTrackingBySelector('.btnServicos', (_, index) => ({
+        eventName: 'clique_agendamento',
+        category: 'Botoes',
+        label: index === 0
+            ? 'Botao de agendamento na Secao de Servicos'
+            : 'Botao de agendamento no CTA Final'
+    }));
 
-bindTrackingBySelector('#rodape a', (link) => {
-    const text = (link.textContent || '').replace(/\s+/g, ' ').trim();
-    const href = link.getAttribute('href') || 'sem-link';
+    bindTrackingBySelector('#rodape a', (link) => {
+        const text = (link.textContent || '').replace(/\s+/g, ' ').trim();
+        const href = link.getAttribute('href') || 'sem-link';
 
-    return {
-        eventName: 'clique_footer',
-        category: 'Footer',
-        label: text ? `Footer - ${text}` : `Footer - ${href}`
+        return {
+            eventName: 'clique_footer',
+            category: 'Footer',
+            label: text ? `Footer - ${text}` : `Footer - ${href}`
+        };
+    });
+
+    bindTrackingBySelector('#cardsPort .portfolio', (card, index) => {
+        const title = card.querySelector('.portfolio-caption strong')?.textContent?.trim();
+        const label = title || `Card ${index + 1}`;
+
+        return {
+            eventName: 'clique_portfolio',
+            category: 'Portfolio',
+            label: `Portfolio - ${label}`
+        };
+    });
+}
+
+// ================= APP =================
+function initApp() {
+    const refreshScrollTriggers = () => ScrollTrigger.refresh();
+    const RECOVERY_COOLDOWN_MS = 280;
+    let lastRecoveryAt = 0;
+
+    const runRecoveryCycle = ({ restoreHash = false } = {}) => {
+        const now = (typeof performance !== "undefined" && performance.now)
+            ? performance.now()
+            : Date.now();
+
+        if (now - lastRecoveryAt < RECOVERY_COOLDOWN_MS) return;
+        lastRecoveryAt = now;
+
+        window.requestAnimationFrame(() => {
+            if (restoreHash) {
+                restoreHashScrollImmediate();
+            }
+
+            refreshScrollTriggers();
+            playAnimationsOnReload();
+        });
     };
-});
 
-bindTrackingBySelector('#cardsPort .portfolio', (card, index) => {
-    const title = card.querySelector('.portfolio-caption strong')?.textContent?.trim();
-    const label = title || `Card ${index + 1}`;
+    // Garantir que animações disparem ao recarregar independente da posição
+    function playAnimationsOnReload() {
+        const motion = getMotionProfile();
+        if (motion.reduce) return;
 
-    return {
-        eventName: 'clique_portfolio',
-        category: 'Portfolio',
-        label: `Portfolio - ${label}`
-    };
-});
+        window.requestAnimationFrame(() => {
+            try { ScrollTrigger.refresh(); ScrollTrigger.update(); } catch (e) { }
+            const triggers = (ScrollTrigger.getAll && ScrollTrigger.getAll()) || [];
+            const isMostlyInViewport = (el, minRatio = 0.15) => {
+                if (!el || !el.getBoundingClientRect) return false;
+                const r = el.getBoundingClientRect();
+                const vh = window.innerHeight || document.documentElement.clientHeight;
+                const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+                const h = r.height || 1;
+                return (visible / h) >= minRatio;
+            };
+
+
+            const defaultMin = isMobileViewport() ? 0.55 : 0.12;
+            const hasHashLanding = Boolean(window.location.hash && window.location.hash !== "#" && window.location.hash !== "#top");
+            const viewportTop = 0;
+            const viewportMargin = isMobileViewport() ? 8 : 2;
+
+            triggers.forEach((st) => {
+                try {
+                    const triggerEl = st.trigger || st.scroller || null;
+                    const specialLargeSection = triggerEl && (triggerEl.id === 'sobre' || triggerEl.id === 'valores');
+                    const minRatio = specialLargeSection
+                        ? (isMobileViewport() ? 0.75 : 0.25)
+                        : defaultMin;
+                    const inView = triggerEl ? isMostlyInViewport(triggerEl, minRatio) : false;
+                    const anim = st.animation;
+
+                    if (anim) {
+                        const vars = st.vars || st._vars || {};
+                        const isScrub = Object.prototype.hasOwnProperty.call(vars, 'scrub');
+                        const isOnce = Boolean(vars.once);
+                        const rect = triggerEl?.getBoundingClientRect ? triggerEl.getBoundingClientRect() : null;
+                        const isAboveViewport = Boolean(rect && rect.bottom <= viewportTop + viewportMargin);
+
+                        if (isScrub) {
+                            // Scrubbed animations should reflect scroll position
+                            try {
+                                const prog = (typeof st.progress === 'number') ? st.progress : (st.progress && st.progress());
+                                if (typeof anim.progress === 'function') anim.progress(prog || 0);
+                                if (typeof anim.pause === 'function') anim.pause();
+                            } catch (e) { }
+                        } else if (hasHashLanding && isOnce && isAboveViewport) {
+                            // On hash landing (e.g. #portfolio), complete one-shot animations that are already behind the scroll position.
+                            try {
+                                if (typeof anim.progress === 'function') anim.progress(1);
+                                if (typeof anim.pause === 'function') anim.pause();
+                                if (typeof anim.kill === 'function') anim.kill();
+                            } catch (e) { }
+                        } else if (inView) {
+                            try {
+                                if (typeof anim.restart === 'function') anim.restart(true);
+                                if (typeof anim.play === 'function') anim.play();
+                            } catch (e) { }
+                        }
+                    } else {
+                        const vars = st.vars || st._vars || {};
+                        if (inView) {
+                            if (typeof vars.onEnter === 'function') vars.onEnter();
+                            if (typeof vars.onEnterBack === 'function') vars.onEnterBack();
+                        }
+                    }
+                } catch (e) { }
+            });
+
+            try { ScrollTrigger.update(); } catch (e) { }
+        });
+    }
+
+    initGlobalAnimationOptimization();
+    initNavbarScroll();
+    initNavSectionHighlight();
+    initMobileMenu();
+    initFloatingContactFab();
+    initAnchors();
+    initPalavras();
+    initPortfolio();
+    initDepoimentos();
+    initFaqAccordion();
+    initTracking();
+
+    document.fonts.ready.then(() => {
+        animarPagina();
+        refreshScrollTriggers();
+        runRecoveryCycle({ restoreHash: true });
+    }).catch(() => { });
+
+    window.addEventListener("load", () => {
+        runRecoveryCycle();
+    });
+
+    window.addEventListener("pageshow", (event) => {
+        if (!event.persisted) return;
+        runRecoveryCycle({ restoreHash: true });
+    });
+
+    addResizeAndOrientation(refreshScrollTriggers, 150);
+}
