@@ -22,31 +22,84 @@ btnFechar.addEventListener('click', () => {
 });
 
 let classificador;
+let dispositivosCamera = [];
+let indiceCameraAtiva = 0;
 
 // ==========================================
 // FUNÇÕES DA CÂMERA
 // ==========================================
+async function atualizarDispositivosCamera() {
+    const dispositivos = await navigator.mediaDevices.enumerateDevices();
+    dispositivosCamera = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
+}
+
+function identificarLadoCamera(rotulo = '') {
+    const texto = rotulo.toLowerCase();
+
+    if (/front|frontal|user/.test(texto)) {
+        return 'frontal';
+    }
+
+    if (/back|rear|environment|traseir/.test(texto)) {
+        return 'traseira';
+    }
+
+    return 'desconhecida';
+}
+
+function escolherDispositivoCamera(usarFrontal) {
+    if (dispositivosCamera.length === 0) {
+        return null;
+    }
+
+    const camerasFrontais = dispositivosCamera.filter(dispositivo => identificarLadoCamera(dispositivo.label) === 'frontal');
+    const camerasTraseiras = dispositivosCamera.filter(dispositivo => identificarLadoCamera(dispositivo.label) === 'traseira');
+
+    if (usarFrontal) {
+        return camerasFrontais[0] || dispositivosCamera[0];
+    }
+
+    if (camerasTraseiras[0]) {
+        return camerasTraseiras[0];
+    }
+
+    if (dispositivosCamera.length > 1) {
+        return dispositivosCamera.find((_, indice) => indice !== indiceCameraAtiva) || dispositivosCamera[dispositivosCamera.length - 1];
+    }
+
+    return dispositivosCamera[0];
+}
+
 async function iniciarCamera(usarFrontal) {
     if (visor.srcObject) {
         visor.srcObject.getTracks().forEach(track => track.stop());
     }
 
-    const constraints = {
-        video: { facingMode: usarFrontal ? "user" : "environment" }
-    };
-
     try {
+        await atualizarDispositivosCamera();
+
+        const dispositivoEscolhido = escolherDispositivoCamera(usarFrontal);
+        const constraints = dispositivoEscolhido
+            ? { video: { deviceId: { exact: dispositivoEscolhido.deviceId } } }
+            : { video: { facingMode: usarFrontal ? "user" : "environment" } };
+
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         visor.srcObject = stream;
+
+        if (dispositivoEscolhido) {
+            indiceCameraAtiva = dispositivosCamera.findIndex(dispositivo => dispositivo.deviceId === dispositivoEscolhido.deviceId);
+        }
+
+        await visor.play().catch(() => { });
     } catch (err) {
         console.error("Erro ao acessar câmera: ", err);
         textoResultado.innerText = "Erro ao alternar câmera.";
     }
 }
 
-document.getElementById('btnInverterCamera').onclick = () => {
+document.getElementById('btnInverterCamera').onclick = async () => {
     usoFrontal = !usoFrontal;
-    iniciarCamera(usoFrontal);
+    await iniciarCamera(usoFrontal);
 };
 
 function tirarFoto() {
@@ -76,7 +129,7 @@ function tirarFoto() {
 
         // Caso a IA encontre objetos, prosseguimos normalmente
         const palpite = predictions[0].class;
-        const certeza = Math.round(predictions[0].score * 100); 
+        const certeza = Math.round(predictions[0].score * 100);
 
         textoResultado.innerText = `Identificou: ${palpite} (Certeza: ${certeza}%)`;
 
@@ -94,7 +147,7 @@ function tirarFoto() {
 // ==========================================
 function inicializarIA() {
     textoResultado.innerText = "Carregando motor COCO-SSD oficial";
-    
+
     // Pede para a biblioteca oficial baixar o modelo da nuvem
     cocoSsd.load().then(modelo => {
         classificador = modelo;
@@ -113,13 +166,13 @@ function inicializarIA() {
 function salvarFoto(label, imagemData) {
     // Pega o que já existe no banco (ou cria uma lista vazia se for a primeira vez)
     let galeria = JSON.parse(localStorage.getItem('minhaGaleria')) || [];
-    
+
     // Adiciona a nova foto
     galeria.push({ label: label, data: imagemData });
-    
+
     // Salva de volta no LocalStorage
     localStorage.setItem('minhaGaleria', JSON.stringify(galeria));
-    
+
     // Atualiza a tela
     renderizarGaleria();
 }
@@ -127,19 +180,19 @@ function salvarFoto(label, imagemData) {
 // Função para mostrar as fotos na tela
 function renderizarGaleria(filtro = 'Tudo') {
     const container = document.getElementById('fotosSalvas');
-    container.innerHTML = ''; 
-    
+    container.innerHTML = '';
+
     let galeria = JSON.parse(localStorage.getItem('minhaGaleria')) || [];
     let fotosParaMostrar = filtro === 'Tudo' ? galeria : galeria.filter(item => item.label === filtro);
-    
+
     fotosParaMostrar.forEach((item, index) => {
         const div = document.createElement('div');
         div.style.position = 'relative';
-        
+
         const img = document.createElement('img');
         img.src = item.data;
         img.style.width = '150px';
-        
+
         const btnExcluir = document.createElement('button');
         btnExcluir.innerText = "X";
         btnExcluir.style.position = 'absolute';
@@ -150,7 +203,7 @@ function renderizarGaleria(filtro = 'Tudo') {
             localStorage.setItem('minhaGaleria', JSON.stringify(galeria));
             renderizarGaleria(filtro); // Recarrega a tela
         };
-        
+
         div.appendChild(img);
         div.appendChild(btnExcluir);
         container.appendChild(div);
