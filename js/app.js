@@ -26,42 +26,28 @@ let classificador;
 // ==========================================
 // FUNÇÕES DA CÂMERA
 // ==========================================
-async function iniciarCamera() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' } 
-        });
-        visor.srcObject = stream;
-    } catch (erro) {
-        console.error("Erro ao acessar a câmera: ", erro);
-        alert("Não foi possível acessar a câmera. Verifique as permissões.");
-    }
-
-    // Para a câmera atual antes de iniciar a nova
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
+async function iniciarCamera(usarFrontal) {
+    if (visor.srcObject) {
+        visor.srcObject.getTracks().forEach(track => track.stop());
     }
 
     const constraints = {
-        video: {
-            facingMode: usarFrontal ? "user" : "environment"
-        }
+        video: { facingMode: usarFrontal ? "user" : "environment" }
     };
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
+        visor.srcObject = stream;
     } catch (err) {
         console.error("Erro ao acessar câmera: ", err);
         textoResultado.innerText = "Erro ao alternar câmera.";
     }
-
-    // Botão de inverter
-    document.getElementById('btnInverterCamera').onclick = () => {
-        usoFrontal = !usoFrontal; // Alterna entre true e false
-        iniciarCamera(usoFrontal);
-    };
 }
+
+document.getElementById('btnInverterCamera').onclick = () => {
+    usoFrontal = !usoFrontal;
+    iniciarCamera(usoFrontal);
+};
 
 function tirarFoto() {
     // Prepara e desenha o canvas
@@ -179,5 +165,5 @@ function filtrarGaleria(categoria) {
 // INICIALIZAÇÃO
 // ==========================================
 btnCapturar.addEventListener('click', tirarFoto);
-iniciarCamera();
+iniciarCamera(usoFrontal);
 inicializarIA();
