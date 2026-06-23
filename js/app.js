@@ -3,6 +3,7 @@
 // ==========================================
 const visor = document.getElementById('visor');
 const btnCapturar = document.getElementById('btnCapturar');
+let usoFrontal = true;
 const canvas = document.getElementById('fotoRevelada');
 const textoResultado = document.getElementById('textoResultado');
 const contexto = canvas.getContext('2d');
@@ -35,6 +36,31 @@ async function iniciarCamera() {
         console.error("Erro ao acessar a câmera: ", erro);
         alert("Não foi possível acessar a câmera. Verifique as permissões.");
     }
+
+    // Para a câmera atual antes de iniciar a nova
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    const constraints = {
+        video: {
+            facingMode: usarFrontal ? "user" : "environment"
+        }
+    };
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+    } catch (err) {
+        console.error("Erro ao acessar câmera: ", err);
+        textoResultado.innerText = "Erro ao alternar câmera.";
+    }
+
+    // Botão de inverter
+    document.getElementById('btnInverterCamera').onclick = () => {
+        usoFrontal = !usoFrontal; // Alterna entre true e false
+        iniciarCamera(usoFrontal);
+    };
 }
 
 function tirarFoto() {
