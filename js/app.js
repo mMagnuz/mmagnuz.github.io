@@ -1,5 +1,5 @@
 // ==========================================
-// VARIÁVEIS E ELEMENTOS DA TELA
+// DOM
 // ==========================================
 const visor = document.getElementById('visor');
 const btnCapturar = document.getElementById('btnCapturar');
@@ -7,6 +7,29 @@ let usoFrontal = true;
 const canvas = document.getElementById('fotoRevelada');
 const textoResultado = document.getElementById('textoResultado');
 const contexto = canvas.getContext('2d');
+const LIMIAR_CONFIANCA = 0.66;
+const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'paisagens', 'objetos', 'Desconhecido'];
+
+const MAPA_COCO_PARA_CATEGORIA = {
+    person: 'pessoas',
+    bird: 'animais',
+    cat: 'animais',
+    dog: 'animais',
+    horse: 'animais',
+    sheep: 'animais',
+    cow: 'animais',
+    elephant: 'animais',
+    bear: 'animais',
+    zebra: 'animais',
+    giraffe: 'animais'
+};
+
+const LABELS_OBJETOS = new Set([
+    'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
+    'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
+    'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
+    'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
+]);
 
 const modal = document.getElementById('modalGaleria');
 const btnAbrir = document.getElementById('btnAbrirGaleria');
@@ -22,6 +45,104 @@ btnFechar.addEventListener('click', () => {
 });
 
 let classificador;
+
+function normalizarCategoria(categoria) {
+    const valor = String(categoria || '').trim();
+
+    if (CATEGORIAS_VALIDAS.includes(valor)) {
+        return valor;
+    }
+
+    return 'Desconhecido';
+}
+
+function mapearClasseParaCategoria(classe) {
+    if (!classe) {
+        return 'Desconhecido';
+    }
+
+    if (MAPA_COCO_PARA_CATEGORIA[classe]) {
+        return MAPA_COCO_PARA_CATEGORIA[classe];
+    }
+
+    if (LABELS_OBJETOS.has(classe)) {
+        return 'objetos';
+    }
+
+    return 'objetos';
+}
+
+function resumirPredicoes(predictions) {
+    const filtradas = predictions
+        .filter(predicao => predicao.score >= 0.3)
+        .slice(0, 5);
+
+    if (filtradas.length === 0) {
+        return {
+            categoria: 'Desconhecido',
+            confianca: 0,
+            destaque: null
+        };
+    }
+
+    const votos = new Map();
+
+    filtradas.forEach(predicao => {
+        const categoria = mapearClasseParaCategoria(predicao.class);
+        const acumulado = votos.get(categoria) || 0;
+        votos.set(categoria, acumulado + predicao.score);
+    });
+
+    let categoriaVencedora = 'objetos';
+    let melhorPeso = -1;
+
+    votos.forEach((peso, categoria) => {
+        if (peso > melhorPeso) {
+            melhorPeso = peso;
+            categoriaVencedora = categoria;
+        }
+    });
+
+    const destaque = filtradas[0];
+
+    return {
+        categoria: categoriaVencedora,
+        confianca: destaque.score,
+        destaque,
+        usadas: filtradas
+    };
+}
+
+async function extrairTextoOCR() {
+    if (typeof Tesseract === 'undefined') {
+        return '';
+    }
+
+    try {
+        const resultado = await Tesseract.recognize(canvas, 'por+eng');
+        return resultado.data.text || '';
+    } catch (erro) {
+        console.warn('OCR falhou:', erro);
+        return '';
+    }
+}
+
+function decidirCategoriaManual(categoriaSugerida, confianca) {
+    const resposta = window.confirm(
+        `A IA sugeriu "${categoriaSugerida}" com ${Math.round(confianca * 100)}% de confiança. Confirmar?`
+    );
+
+    if (resposta) {
+        return categoriaSugerida;
+    }
+
+    const alternativa = window.prompt(
+        'Digite a categoria final: pessoas, animais, paisagens, objetos ou Desconhecido',
+        categoriaSugerida
+    );
+
+    return normalizarCategoria(alternativa);
+}
 
 // ==========================================
 // FUNÇÕES DA CÂMERA
@@ -66,26 +187,27 @@ function tirarFoto() {
     // Inicia o processo de análise
     textoResultado.innerText = "Analisando a imagem...";
 
-    classificador.detect(canvas).then(predictions => {
+    Promise.all([
+        classificador.detect(canvas)
+    ]).then(([predictions]) => {
         // Captura a imagem sempre, independente do sucesso da IA
         const imagemBase64 = canvas.toDataURL('image/jpeg');
+        const resumo = resumirPredicoes(predictions);
 
-        // Verifica se a IA encontrou algo
-        if (predictions.length === 0) {
-            textoResultado.innerText = "Nenhum objeto reconhecido.";
-            // Mesmo sem objetos, salva com o rótulo "Desconhecido"
-            salvarFoto("Desconhecido", imagemBase64);
-            return;
+        let categoriaFinal = resumo.categoria;
+        let confiancaFinal = resumo.confianca;
+
+        if (categoriaFinal === 'Desconhecido') {
+            categoriaFinal = 'paisagens';
+            confiancaFinal = 0.35;
         }
 
-        // Caso a IA encontre objetos, prosseguimos normalmente
-        const palpite = predictions[0].class;
-        const certeza = Math.round(predictions[0].score * 100);
+        if (confiancaFinal < LIMIAR_CONFIANCA) {
+            categoriaFinal = decidirCategoriaManual(categoriaFinal, confiancaFinal);
+        }
 
-        textoResultado.innerText = `Identificou: ${palpite} (Certeza: ${certeza}%)`;
-
-        // Salva com o nome do objeto identificado
-        salvarFoto(palpite, imagemBase64);
+        textoResultado.innerText = `Categoria: ${categoriaFinal} (Confiança: ${Math.round(confiancaFinal * 100)}%)`;
+        salvarFoto(categoriaFinal, imagemBase64);
 
     }).catch(erro => {
         console.error("Erro na detecção: ", erro);
@@ -169,6 +291,5 @@ function filtrarGaleria(categoria) {
 // INICIALIZAÇÃO
 // ==========================================
 btnCapturar.addEventListener('click', tirarFoto);
-inicializarIA();
 iniciarCamera(usoFrontal);
 inicializarIA();
