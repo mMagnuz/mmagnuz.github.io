@@ -8,28 +8,90 @@ const canvas = document.getElementById('fotoRevelada');
 const textoResultado = document.getElementById('textoResultado');
 const contexto = canvas.getContext('2d');
 const LIMIAR_CONFIANCA = 0.66;
-const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'paisagens', 'objetos', 'Desconhecido'];
+const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'objetos', 'Desconhecido'];
 
 const MAPA_COCO_PARA_CATEGORIA = {
-    person: 'pessoas',
-    bird: 'animais',
-    cat: 'animais',
-    dog: 'animais',
-    horse: 'animais',
-    sheep: 'animais',
-    cow: 'animais',
-    elephant: 'animais',
-    bear: 'animais',
-    zebra: 'animais',
-    giraffe: 'animais'
+    'person': 'pessoas',
+    'bicycle': 'objetos',
+    'car': 'objetos',
+    'motorcycle': 'objetos',
+    'airplane': 'objetos',
+    'bus': 'objetos',
+    'train': 'objetos',
+    'truck': 'objetos',
+    'boat': 'objetos',
+    'traffic light': 'objetos',
+    'fire hydrant': 'objetos',
+    'stop sign': 'objetos',
+    'parking meter': 'objetos',
+    'bench': 'objetos',
+    'bird': 'animais',
+    'cat': 'animais',
+    'dog': 'animais',
+    'horse': 'animais',
+    'sheep': 'animais',
+    'cow': 'animais',
+    'elephant': 'animais',
+    'bear': 'animais',
+    'zebra': 'animais',
+    'giraffe': 'animais',
+    'backpack': 'objetos',
+    'umbrella': 'objetos',
+    'handbag': 'objetos',
+    'tie': 'objetos',
+    'suitcase': 'objetos',
+    'frisbee': 'objetos',
+    'skis': 'objetos',
+    'snowboard': 'objetos',
+    'sports ball': 'objetos',
+    'kite': 'objetos',
+    'baseball bat': 'objetos',
+    'baseball glove': 'objetos',
+    'skateboard': 'objetos',
+    'surfboard': 'objetos',
+    'tennis racket': 'objetos',
+    'bottle': 'objetos',
+    'wine glass': 'objetos',
+    'cup': 'objetos',
+    'fork': 'objetos',
+    'knife': 'objetos',
+    'spoon': 'objetos',
+    'bowl': 'objetos',
+    'banana': 'objetos',
+    'apple': 'objetos',
+    'sandwich': 'objetos',
+    'orange': 'objetos',
+    'broccoli': 'objetos',
+    'carrot': 'objetos',
+    'hot dog': 'objetos',
+    'pizza': 'objetos',
+    'donut': 'objetos',
+    'cake': 'objetos',
+    'chair': 'objetos',
+    'couch': 'objetos',
+    'potted plant': 'objetos',
+    'bed': 'objetos',
+    'dining table': 'objetos',
+    'toilet': 'objetos',
+    'tv': 'objetos',
+    'laptop': 'objetos',
+    'mouse': 'objetos',
+    'remote': 'objetos',
+    'keyboard': 'objetos',
+    'cell phone': 'objetos',
+    'microwave': 'objetos',
+    'oven': 'objetos',
+    'toaster': 'objetos',
+    'sink': 'objetos',
+    'refrigerator': 'objetos',
+    'book': 'objetos',
+    'clock': 'objetos',
+    'vase': 'objetos',
+    'scissors': 'objetos',
+    'teddy bear': 'objetos',
+    'hair drier': 'objetos',
+    'toothbrush': 'objetos'
 };
-
-const LABELS_OBJETOS = new Set([
-    'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
-    'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
-    'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe',
-    'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush'
-]);
 
 const modal = document.getElementById('modalGaleria');
 const btnAbrir = document.getElementById('btnAbrirGaleria');
@@ -65,17 +127,12 @@ function mapearClasseParaCategoria(classe) {
         return MAPA_COCO_PARA_CATEGORIA[classe];
     }
 
-    if (LABELS_OBJETOS.has(classe)) {
-        return 'objetos';
-    }
-
     return 'objetos';
 }
 
 function resumirPredicoes(predictions) {
     const filtradas = predictions
-        .filter(predicao => predicao.score >= 0.3)
-        .slice(0, 5);
+        .filter(predicao => predicao.score >= 0.2);
 
     if (filtradas.length === 0) {
         return {
@@ -104,27 +161,15 @@ function resumirPredicoes(predictions) {
     });
 
     const destaque = filtradas[0];
+    const pesoTotal = Array.from(votos.values()).reduce((soma, peso) => soma + peso, 0);
+    const confiancaRelativa = pesoTotal > 0 ? melhorPeso / pesoTotal : destaque.score;
 
     return {
         categoria: categoriaVencedora,
-        confianca: destaque.score,
+        confianca: Math.max(destaque.score, confiancaRelativa),
         destaque,
         usadas: filtradas
     };
-}
-
-async function extrairTextoOCR() {
-    if (typeof Tesseract === 'undefined') {
-        return '';
-    }
-
-    try {
-        const resultado = await Tesseract.recognize(canvas, 'por+eng');
-        return resultado.data.text || '';
-    } catch (erro) {
-        console.warn('OCR falhou:', erro);
-        return '';
-    }
 }
 
 function decidirCategoriaManual(categoriaSugerida, confianca) {
@@ -137,7 +182,7 @@ function decidirCategoriaManual(categoriaSugerida, confianca) {
     }
 
     const alternativa = window.prompt(
-        'Digite a categoria final: pessoas, animais, paisagens, objetos ou Desconhecido',
+        'Digite a categoria final: pessoas, animais, objetos ou Desconhecido',
         categoriaSugerida
     );
 
@@ -187,20 +232,13 @@ function tirarFoto() {
     // Inicia o processo de análise
     textoResultado.innerText = "Analisando a imagem...";
 
-    Promise.all([
-        classificador.detect(canvas)
-    ]).then(([predictions]) => {
+    classificador.detect(canvas).then(predictions => {
         // Captura a imagem sempre, independente do sucesso da IA
         const imagemBase64 = canvas.toDataURL('image/jpeg');
         const resumo = resumirPredicoes(predictions);
 
         let categoriaFinal = resumo.categoria;
         let confiancaFinal = resumo.confianca;
-
-        if (categoriaFinal === 'Desconhecido') {
-            categoriaFinal = 'paisagens';
-            confiancaFinal = 0.35;
-        }
 
         if (confiancaFinal < LIMIAR_CONFIANCA) {
             categoriaFinal = decidirCategoriaManual(categoriaFinal, confiancaFinal);
