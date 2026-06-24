@@ -8,6 +8,9 @@ const canvas = document.getElementById('fotoRevelada');
 const textoResultado = document.getElementById('textoResultado');
 const contexto = canvas.getContext('2d');
 const LIMIAR_CONFIANCA = 0.66;
+const QUANTIDADE_FRAMES_ANALISE = 5;
+const LIMIAR_FRAME_VALIDO = 0.35;
+const LIMIAR_CONSENSO_FRAMES = 0.6;
 const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'objetos', 'Desconhecido'];
 
 const MAPA_COCO_PARA_CATEGORIA = {
@@ -172,6 +175,51 @@ function resumirPredicoes(predictions) {
     };
 }
 
+function aguardarProximoFrame() {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+}
+
+async function analisarMultiplosFrames(quantidadeFrames = 5) {
+    const todasPredicoes = [];
+    const votosPorFrame = new Map();
+
+    for (let indice = 0; indice < quantidadeFrames; indice += 1) {
+        const predicoesDoFrame = await classificador.detect(visor);
+        const resumoDoFrame = resumirPredicoes(predicoesDoFrame);
+
+        if (resumoDoFrame.confianca >= LIMIAR_FRAME_VALIDO) {
+            todasPredicoes.push(...resumoDoFrame.usadas);
+            const votos = votosPorFrame.get(resumoDoFrame.categoria) || 0;
+            votosPorFrame.set(resumoDoFrame.categoria, votos + 1);
+        }
+
+        await aguardarProximoFrame();
+    }
+
+    const resumoFinal = resumirPredicoes(todasPredicoes);
+    const totalFramesValidos = Array.from(votosPorFrame.values()).reduce((soma, valor) => soma + valor, 0);
+
+    if (totalFramesValidos > 0) {
+        let categoriaConsenso = resumoFinal.categoria;
+        let maiorVotos = 0;
+
+        votosPorFrame.forEach((votos, categoria) => {
+            if (votos > maiorVotos) {
+                maiorVotos = votos;
+                categoriaConsenso = categoria;
+            }
+        });
+
+        const percentualConsenso = maiorVotos / totalFramesValidos;
+
+        if (percentualConsenso >= LIMIAR_CONSENSO_FRAMES) {
+            resumoFinal.categoria = categoriaConsenso;
+        }
+    }
+
+    return resumoFinal;
+}
+
 function decidirCategoriaManual(categoriaSugerida, confianca) {
     const resposta = window.confirm(
         `A IA sugeriu "${categoriaSugerida}" com ${Math.round(confianca * 100)}% de confiança. Confirmar?`
@@ -224,19 +272,19 @@ function tirarFoto() {
     canvas.width = visor.videoWidth;
     canvas.height = visor.videoHeight;
     contexto.drawImage(visor, 0, 0, canvas.width, canvas.height);
+    const imagemBase64 = canvas.toDataURL('image/jpeg');
     canvas.style.display = 'block';
 
     // Se a IA ainda não carregou, encerra a função aqui
-    if (!classificador) return;
+    if (!classificador) {
+        salvarFoto('Desconhecido', imagemBase64);
+        return;
+    }
 
     // Inicia o processo de análise
-    textoResultado.innerText = "Analisando a imagem...";
+    textoResultado.innerText = "Analisando vários frames...";
 
-    classificador.detect(canvas).then(predictions => {
-        // Captura a imagem sempre, independente do sucesso da IA
-        const imagemBase64 = canvas.toDataURL('image/jpeg');
-        const resumo = resumirPredicoes(predictions);
-
+    analisarMultiplosFrames(QUANTIDADE_FRAMES_ANALISE).then(resumo => {
         let categoriaFinal = resumo.categoria;
         let confiancaFinal = resumo.confianca;
 
