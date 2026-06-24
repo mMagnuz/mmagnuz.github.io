@@ -179,7 +179,7 @@ function aguardarProximoFrame() {
     return new Promise(resolve => requestAnimationFrame(() => resolve()));
 }
 
-async function analisarMultiplosFrames(quantidadeFrames = 5) {
+async function analisarMultiplosFrames(quantidadeFrames = 10) {
     const todasPredicoes = [];
     const votosPorFrame = new Map();
 
