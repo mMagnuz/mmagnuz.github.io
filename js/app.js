@@ -22,78 +22,29 @@ btnFechar.addEventListener('click', () => {
 });
 
 let classificador;
-let dispositivosCamera = [];
-let indiceCameraAtiva = 0;
 
 // ==========================================
 // FUNÇÕES DA CÂMERA
 // ==========================================
-async function atualizarDispositivosCamera() {
-    const dispositivos = await navigator.mediaDevices.enumerateDevices();
-    dispositivosCamera = dispositivos.filter(dispositivo => dispositivo.kind === 'videoinput');
-}
-
-function identificarLadoCamera(rotulo = '') {
-    const texto = rotulo.toLowerCase();
-
-    if (/front|frontal|user/.test(texto)) {
-        return 'frontal';
-    }
-
-    if (/back|rear|environment|traseir/.test(texto)) {
-        return 'traseira';
-    }
-
-    return 'desconhecida';
-}
-
-function escolherDispositivoCamera(usarFrontal) {
-    if (dispositivosCamera.length === 0) {
-        return null;
-    }
-
-    const camerasFrontais = dispositivosCamera.filter(dispositivo => identificarLadoCamera(dispositivo.label) === 'frontal');
-    const camerasTraseiras = dispositivosCamera.filter(dispositivo => identificarLadoCamera(dispositivo.label) === 'traseira');
-
-    if (usarFrontal) {
-        return camerasFrontais[0] || dispositivosCamera[0];
-    }
-
-    if (camerasTraseiras[0]) {
-        return camerasTraseiras[0];
-    }
-
-    if (dispositivosCamera.length > 1) {
-        return dispositivosCamera.find((_, indice) => indice !== indiceCameraAtiva) || dispositivosCamera[dispositivosCamera.length - 1];
-    }
-
-    return dispositivosCamera[0];
-}
-
 async function iniciarCamera(usarFrontal) {
     if (visor.srcObject) {
         visor.srcObject.getTracks().forEach(track => track.stop());
     }
 
     try {
-        await atualizarDispositivosCamera();
-
-        const dispositivoEscolhido = escolherDispositivoCamera(usarFrontal);
-        const constraints = dispositivoEscolhido
-            ? { video: { deviceId: { exact: dispositivoEscolhido.deviceId } } }
-            : { video: { facingMode: usarFrontal ? "user" : "environment" } };
+        const constraints = {
+            video: {
+                facingMode: { ideal: usarFrontal ? "user" : "environment" }
+            }
+        };
 
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         visor.srcObject = stream;
 
-        if (dispositivoEscolhido) {
-            indiceCameraAtiva = dispositivosCamera.findIndex(dispositivo => dispositivo.deviceId === dispositivoEscolhido.deviceId);
-        }
-
         await visor.play().catch(() => { });
     } catch (err) {
         console.error("Erro ao acessar câmera: ", err);
-        textoResultado.innerText = "Erro ao alternar câmera.";
+        textoResultado.innerText = "Erro ao acessar a câmera.";
     }
 }
 
@@ -218,5 +169,6 @@ function filtrarGaleria(categoria) {
 // INICIALIZAÇÃO
 // ==========================================
 btnCapturar.addEventListener('click', tirarFoto);
+inicializarIA();
 iniciarCamera(usoFrontal);
 inicializarIA();
