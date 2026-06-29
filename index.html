@@ -91,7 +91,7 @@
 
     <canvas id="fotoRevelada"></canvas>
 
-    <h2 id="textoResultado">Aguardando...</h2>
+    <h2 id="textoResultado"></h2>
 
     <button id="btnAbrirGaleria">Ver Galeria</button>
 
@@ -99,11 +99,11 @@
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); overflow-y: auto; z-index: 1000;">
         <button id="btnFecharGaleria" style="margin: 20px;">Fechar</button>
         <div id="filtros" style="margin-bottom: 20px;">
-            <button onclick="filtrarGaleria('Tudo')">Tudo</button>
+            <button onclick="filtrarGaleria('tudo')">Tudo</button>
             <button onclick="filtrarGaleria('pessoas')">Pessoas</button>
             <button onclick="filtrarGaleria('animais')">Animais</button>
             <button onclick="filtrarGaleria('objetos')">Objetos</button>
-            <button onclick="filtrarGaleria('Desconhecido')">Desconhecidos</button>
+            <button onclick="filtrarGaleria('desconhecido')">Desconhecidos</button>
         </div>
         <div id="fotosSalvas" style="display: flex; flex-wrap: wrap; padding: 20px;"></div>
     </div>

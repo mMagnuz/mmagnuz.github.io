@@ -11,7 +11,7 @@ const LIMIAR_CONFIANCA = 0.66;
 const QUANTIDADE_FRAMES_ANALISE = 5;
 const LIMIAR_FRAME_VALIDO = 0.35;
 const LIMIAR_CONSENSO_FRAMES = 0.6;
-const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'objetos', 'Desconhecido'];
+const CATEGORIAS_VALIDAS = ['pessoas', 'animais', 'objetos', 'desconhecido'];
 
 const MAPA_COCO_PARA_CATEGORIA = {
     'person': 'pessoas',
@@ -118,12 +118,12 @@ function normalizarCategoria(categoria) {
         return valor;
     }
 
-    return 'Desconhecido';
+    return 'desconhecido';
 }
 
 function mapearClasseParaCategoria(classe) {
     if (!classe) {
-        return 'Desconhecido';
+        return 'desconhecido';
     }
 
     if (MAPA_COCO_PARA_CATEGORIA[classe]) {
@@ -139,7 +139,7 @@ function resumirPredicoes(predictions) {
 
     if (filtradas.length === 0) {
         return {
-            categoria: 'Desconhecido',
+            categoria: 'desconhecido',
             confianca: 0,
             destaque: null
         };
@@ -230,7 +230,7 @@ function decidirCategoriaManual(categoriaSugerida, confianca) {
     }
 
     const alternativa = window.prompt(
-        'Digite a categoria final: pessoas, animais, objetos ou Desconhecido',
+        'Digite a categoria final: pessoas, animais, objetos ou desconhecido',
         categoriaSugerida
     );
 
@@ -277,7 +277,7 @@ function tirarFoto() {
 
     // Se a IA ainda não carregou, encerra a função aqui
     if (!classificador) {
-        salvarFoto('Desconhecido', imagemBase64);
+        salvarFoto('desconhecido', imagemBase64);
         return;
     }
 
@@ -335,12 +335,12 @@ function salvarFoto(label, imagemData) {
 }
 
 // Função para mostrar as fotos na tela
-function renderizarGaleria(filtro = 'Tudo') {
+function renderizarGaleria(filtro = 'tudo') {
     const container = document.getElementById('fotosSalvas');
     container.innerHTML = '';
 
     let galeria = JSON.parse(localStorage.getItem('minhaGaleria')) || [];
-    let fotosParaMostrar = filtro === 'Tudo' ? galeria : galeria.filter(item => item.label === filtro);
+    let fotosParaMostrar = filtro === 'tudo' ? galeria : galeria.filter(item => item.label === filtro);
 
     fotosParaMostrar.forEach((item, index) => {
         const div = document.createElement('div');
