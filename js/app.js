@@ -305,16 +305,16 @@ function tirarFoto() {
 // FUNÇÕES DA INTELIGÊNCIA ARTIFICIAL
 // ==========================================
 function inicializarIA() {
-    textoResultado.innerText = "Carregando motor COCO-SSD oficial";
+    textoResultado.innerText = "Carregando IA COCO-SSD";
 
     // Pede para a biblioteca oficial baixar o modelo da nuvem
     cocoSsd.load().then(modelo => {
         classificador = modelo;
         textoResultado.innerText = "IA Pronta";
-        console.log("COCO-SSD carregado com sucesso");
+        console.log("COCO SSD carregado com sucesso");
     }).catch(erro => {
         console.error("Erro ao carregar o modelo: ", erro);
-        textoResultado.innerText = "Falha ao baixar o modelo de IA";
+        textoResultado.innerText = "Falha ao carregar IA";
     });
 }
 
@@ -331,8 +331,6 @@ function salvarFoto(label, imagemData) {
 
     // Salva de volta no LocalStorage
     localStorage.setItem('minhaGaleria', JSON.stringify(galeria));
-
-    // Atualiza a tela
     renderizarGaleria();
 }
 
@@ -376,6 +374,6 @@ function filtrarGaleria(categoria) {
 // ==========================================
 // INICIALIZAÇÃO
 // ==========================================
+inicializarIA();
 btnCapturar.addEventListener('click', tirarFoto);
 iniciarCamera(usoFrontal);
-inicializarIA();
